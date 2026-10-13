@@ -10,7 +10,14 @@
 #import "../local/ShortcutPolicy.h"
 
 static NSString *ArcModLogPath(void) {
-	return [NSTemporaryDirectory() stringByAppendingPathComponent:@"arcmod.log"];
+	NSString *session = [NSBundle.mainBundle objectForInfoDictionaryKey:@"ArcModAgentSession"];
+	NSString *name = session.length ? [NSString stringWithFormat:@"arcmod-agent-%@.log", session] : @"arcmod.log";
+	return [NSTemporaryDirectory() stringByAppendingPathComponent:name];
+}
+
+static NSString *ArcModAgentSession(void) {
+	id session = [NSBundle.mainBundle objectForInfoDictionaryKey:@"ArcModAgentSession"];
+	return [session isKindOfClass:NSString.class] ? session : nil;
 }
 
 static void ArcModLog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
@@ -36,11 +43,20 @@ static void ArcModLog(NSString *format, ...) {
 typedef BOOL (*ValidateMenuIMP)(id, SEL, NSMenuItem *);
 static NSMutableDictionary<NSString *, NSValue *> *gOriginalMenuValidators;
 typedef BOOL (*SendActionIMP)(id, SEL, SEL, id, id);
-static SendActionIMP gDiagnosticSendAction;
-static BOOL ArcModDiagnosticSendAction(id self, SEL command, SEL action, id target, id sender) {
-	id receiver = [NSApp targetForAction:action to:target from:sender];
-	ArcModLog(@"shortcut action %@ -> %@", NSStringFromSelector(action), NSStringFromClass([receiver class]));
-	return gDiagnosticSendAction(self, command, action, target, sender);
+static SendActionIMP gOriginalSendAction;
+static BOOL gShortcutDiagnostics;
+static BOOL ArcModSendAction(id self, SEL command, SEL action, id target, id sender) {
+	if (ArcModAgentSession().length && action == NSSelectorFromString(@"newLittleBrowserWindow:")) {
+		// Keep explicit menu/shortcut requests on the same scriptable window kind
+		// as external links. Native target resolution chooses the new-window owner.
+		action = NSSelectorFromString(@"newWindow:");
+		target = nil;
+	}
+	if (gShortcutDiagnostics) {
+		id receiver = [NSApp targetForAction:action to:target from:sender];
+		ArcModLog(@"shortcut action %@ -> %@", NSStringFromSelector(action), NSStringFromClass([receiver class]));
+	}
+	return gOriginalSendAction(self, command, action, target, sender);
 }
 
 static BOOL ArcModLocalMenuAction(NSMenuItem *item) {
@@ -73,14 +89,14 @@ static BOOL ArcModValidateMenuItem(id self, SEL command, NSMenuItem *item) {
 }
 
 static void ArcModInstallHooks(void) {
-	// Explicit troubleshooting only; ordinary launches retain the native action path.
-	if ([NSProcessInfo.processInfo.arguments containsObject:@"--arcmod-shortcut-diagnostics"]) {
+	gShortcutDiagnostics = [NSProcessInfo.processInfo.arguments containsObject:@"--arcmod-shortcut-diagnostics"];
+	if (gShortcutDiagnostics || ArcModAgentSession().length) {
 		Class appClass = NSClassFromString(@"Arc.BrowserApp");
 		Method action = appClass ? class_getInstanceMethod(appClass, @selector(sendAction:to:from:)) : NULL;
 		if (action) {
-			gDiagnosticSendAction = (SendActionIMP)method_getImplementation(action);
-			if (!class_addMethod(appClass, @selector(sendAction:to:from:), (IMP)ArcModDiagnosticSendAction, method_getTypeEncoding(action)))
-				method_setImplementation(action, (IMP)ArcModDiagnosticSendAction);
+			gOriginalSendAction = (SendActionIMP)method_getImplementation(action);
+			if (!class_addMethod(appClass, @selector(sendAction:to:from:), (IMP)ArcModSendAction, method_getTypeEncoding(action)))
+				method_setImplementation(action, (IMP)ArcModSendAction);
 		}
 	}
 	gOriginalMenuValidators = [NSMutableDictionary new];
@@ -151,10 +167,14 @@ static void ArcModInstallWindowBadge(NSWindow *window) {
 		badge.layer.backgroundColor = [NSColor colorWithWhite:0 alpha:0.35].CGColor;
 		badge.layer.borderColor = [NSColor colorWithSRGBRed:0.4 green:0.85 blue:1 alpha:0.45].CGColor;
 		badge.layer.borderWidth = 1;
-		NSTextField *label = [NSTextField labelWithString:@"ARC MOD"];
+		NSString *session = ArcModAgentSession();
+		NSString *badgeText = session.length ? [NSString stringWithFormat:@"ARC MOD · %@", session] : @"ARC MOD";
+		NSTextField *label = [NSTextField labelWithString:badgeText];
 		label.font = [NSFont monospacedSystemFontOfSize:11 weight:NSFontWeightBold];
 		label.textColor = [NSColor colorWithSRGBRed:0.65 green:0.9 blue:1 alpha:1];
 		label.alignment = NSTextAlignmentCenter;
+		label.lineBreakMode = NSLineBreakByTruncatingTail;
+		label.toolTip = badgeText;
 		label.translatesAutoresizingMaskIntoConstraints = NO;
 		[badge addSubview:label];
 		[sidebar addSubview:badge positioned:NSWindowAbove relativeTo:nil];
@@ -162,7 +182,8 @@ static void ArcModInstallWindowBadge(NSWindow *window) {
 		[NSLayoutConstraint activateConstraints:@[
 			[badge.centerXAnchor constraintEqualToAnchor:sidebar.centerXAnchor],
 			[badge.bottomAnchor constraintEqualToAnchor:sidebar.bottomAnchor constant:-16],
-			[badge.widthAnchor constraintEqualToConstant:94], [badge.heightAnchor constraintEqualToConstant:22],
+			[badge.widthAnchor constraintEqualToAnchor:label.widthAnchor constant:18], [badge.heightAnchor constraintEqualToConstant:22],
+			[badge.widthAnchor constraintLessThanOrEqualToAnchor:sidebar.widthAnchor constant:-24],
 			[label.centerXAnchor constraintEqualToAnchor:badge.centerXAnchor], [label.centerYAnchor constraintEqualToAnchor:badge.centerYAnchor],
 		]];
 		ArcModLog(@"ARC MOD sidebar badge installed");
@@ -186,6 +207,9 @@ static void ArcModEnsureLocalWindow(void) {
 }
 
 static void ArcModConsolidateLittleWindows(NSWindow *preferred) {
+	// Agent bundles have their own sidebar and ordinary browser windows. Never
+	// apply the human's singleton Little Arc policy to an agent's navigation.
+	if (ArcModAgentSession().length) return;
 	if (![NSStringFromClass(preferred.class) isEqualToString:@"Arc.LittleBrowserWindow"]) return;
 	// A profile change uses Arc's native close-old/create-new path. Keep its chosen
 	// profile and new window; synchronously retire any previous Little Arc so there
@@ -253,7 +277,9 @@ __attribute__((constructor)) static void ArcModInit(void) {
 		[defaults setBool:NO forKey:key];
 	[defaults setBool:YES forKey:@"hasTurnedOffGithubLiveFolder"];
 	[defaults setBool:YES forKey:@"shouldSkipUnboxingVideo"];
-	[defaults setBool:YES forKey:@"openExternalLinksInLittleBrowserEnabled"];
+	// Little Arc can become key/main but is absent from Arc's AppleScript window
+	// inventory. Route external links through ordinary windows for agent sessions.
+	[defaults setBool:!ArcModAgentSession().length forKey:@"openExternalLinksInLittleBrowserEnabled"];
 	[defaults setDouble:0 forKey:@"datadogTracesSamplingRate"];
 	ArcModLog(@"loaded into %s (main image slide 0x%lx)", _dyld_get_image_name(0), (unsigned long)_dyld_get_image_vmaddr_slide(0));
 	[[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidFinishLaunchingNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {

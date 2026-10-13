@@ -2,6 +2,13 @@
 
 Read-only survey, 2026-10-12. Line numbers refer to `dump/swift-types.swift`.
 
+**Current implementation, 2026-10-13:** see [agent-sessions.md](agent-sessions.md).
+The old separate-profile launch suggestion below did not establish sidebar
+isolation. Agent bundles now isolate by CFBundleName and bundle ID; the current
+probe verifies working loopback CDP. Little Arc is absent from AppleScript window
+enumeration, and normal windows share sidebar items. Do not use `window 1`, a
+matching URL, or a tab UUID alone as a content-ownership handle.
+
 ## AppleScript (`resources/Arc.sdef`)
 
 - Objects: `window` (id, name, active tab, active space, incognito, mode, tabs, spaces; no bounds),
@@ -48,7 +55,9 @@ No binary change:
 1. Long-lived AppleScript/JXA bridge as a local MCP server (spaces, tabs with stable IDs, navigation, JS reads).
 2. CDP: real profile via the inspect toggle + consent, or a separate profile via launch flags; attach with chrome-devtools-mcp / Playwright `connectOverCDP`.
 3. MV3 extension with `debugger` + `nativeMessaging` (Claude-in-Chrome pattern): per-tab CDP, trusted input, screenshots, AX tree, no relaunch.
-4. Link IDs: set a marker via AppleScript JS (e.g. `window.name = <sidebar UUID>`), find it from CDP.
+4. Prefer exact CDP page IDs within an isolated session. A sidebar UUID alone
+   does not identify independent content across shared windows; writing a
+   marker into `window.name` can interfere with page semantics.
 
 Needs patch/injection (re-sign loses keychain groups, CloudKit, push; Sparkle overwrites patches):
 - CDP on the default profile without consent; an in-process server mapping sidebar IDs to `ArcWebContentsDevTools` sessions.

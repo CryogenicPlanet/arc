@@ -137,6 +137,8 @@ export const patchLocalMode = (source: Buffer): Buffer => {
 if (import.meta.main) {
   const file = Bun.argv[2];
   const allowed = ["ArcMod", "ArcModValidation"].map((name) => join(import.meta.dir, `../build/${name}.app/Contents/MacOS/Arc`));
+  const candidate = file?.match(/\/ArcModAgent-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\.app\/Contents\/MacOS\/Arc$/)?.[1];
+  if (candidate && candidate.length <= 32) allowed.push(join(import.meta.dir, `../build/ArcModAgent-${candidate}.app/Contents/MacOS/Arc`));
   if (!file || !allowed.some((path) => realpathSync(file) === join(path))) throw new Error("patch only an ArcMod build executable");
   writeFileSync(file, patchLocalMode(readFileSync(file)));
   console.log("local mode: onboarding disabled, local windows and single Little Arc enabled; performance: compact state JSON, LaunchDarkly offline; account state unchanged");

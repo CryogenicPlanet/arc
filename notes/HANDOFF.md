@@ -30,6 +30,12 @@ the current local-mode implementation; the performance findings below remain ind
 
 ## Goal
 
+Latest agent work: [agent-sessions.md](agent-sessions.md) records the native
+Little Arc/scripting inventory mismatch and shared sidebar ownership. Build
+`--agent <slug>` for isolated app/data/window ownership; the optional per-agent
+loopback CDP bridge supports background target control. Computer Use still sees
+these as native apps until a browser-provider adapter is connected.
+
 The user likes Arc browser but finds it slow and not well suited to being driven by coding agents
 (Codex / Claude Code). We reverse-engineered Arc's **Swift app layer** and stood up a pipeline to
 build and run a **modded copy** of Arc for perf changes, behavior changes, and an agent-control
@@ -135,10 +141,10 @@ wins, patch recipe, live flag values) and `notes/agent-control-surface.md`. Key 
   overrides. Telemetry is already throttled server-side (blocking helps privacy/network, not UI speed).
 - **Agent control (no binary change):** AppleScript gives stable tab/space UUIDs (survive restarts),
   navigation, and `execute javascript` (~10ms/call in a long-lived process; no await, no screenshots).
-  CDP works via a separate profile (`--remote-debugging-port` + non-default `--user-data-dir`) or the
-  `chrome://inspect#remote-debugging` toggle + Arc consent dialog. Recommended: a local MCP server
-  combining AppleScript (IDs/spaces) + CDP (input/screenshots/AX), linking the two via a
-  `window.name = <sidebar UUID>` marker. Native messaging host for the Claude extension is already
+  CDP is now verified in isolated `--agent` bundles with an explicit debugging
+  port. Arc stores Chromium data under the session CFBundleName despite the
+  user-data-dir switch. Use the session's exact CDP target IDs for background
+  input/screenshots; native/sidebar ID mapping remains separate. Native messaging host for the Claude extension is already
   installed; the extension itself is not.
 
 ## Code in the repo

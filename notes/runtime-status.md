@@ -3,6 +3,19 @@
 Target: Arc 1.168.0 (88413), arm64. The initial Git commit records this checkpoint,
 including known failures. It is not a known-good shortcut baseline.
 
+## Agent sessions
+
+`--agent <slug>` creates separate app/data/preferences ownership and routes
+external links and the Little Arc menu action to full browser windows. The
+`codex` session is built, signed and running on loopback CDP port 9223; normal
+ArcMod retains its previous running bundle. Live background checks pass for
+trusted click/text input, screenshot capture, awaited JS, target isolation and
+closed-target rejection without changing the macOS foreground app. Focus
+emulation requires compositor-frame barriers before dispatch and before reset.
+See `agent-sessions.md` for setup, the native/shared-state diagnosis and limits.
+The Computer Use plugin still exposes native apps; a browser-provider/MCP
+adapter is not installed by this change.
+
 ## Implemented and checked
 
 - Local browsing without an account, vendor service filtering, separate ArcMod data,

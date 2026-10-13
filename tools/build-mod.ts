@@ -6,20 +6,18 @@
 //     validation) and without Arc's restricted entitlements (iCloud, keychain groups, push)
 // /Applications/Arc.app is never modified.
 //
-//   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation]
+//   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation | --agent <slug>]
 
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
+import { parseBuildOptions } from "./agent-session";
 
 const root = join(import.meta.dir, "..");
-const argSource = Bun.argv.indexOf("--source");
-const SOURCE = argSource >= 0 ? (Bun.argv[argSource + 1] ?? "") : "/Applications/Arc.app";
-const validation = Bun.argv.includes("--validation");
-const appName = validation ? "ArcModValidation" : "ArcMod";
+const { source: SOURCE, session } = parseBuildOptions(Bun.argv.slice(2));
+const { appName, bundleId: MOD_BUNDLE_ID } = session;
 const OUT = join(root, `build/${appName}.app`);
-const MOD_BUNDLE_ID = validation ? "company.thebrowser.Browser.mod.validation" : "company.thebrowser.Browser.mod";
 const DYLIB_INSTALL = "@executable_path/../Frameworks/ArcMod.dylib";
 
 const sh = (cmd: readonly string[], opts: { quiet?: boolean } = {}): string => {
@@ -48,6 +46,16 @@ const depth = (p: string): number => p.split("/").length;
 
 // ---------------------------------------------------------------------------------------------
 
+const assertOutputStopped = (): void => {
+  const processes = sh(["ps", "-axo", "pid=,command="]);
+  const executable = join(OUT, "Contents/MacOS/Arc");
+  const running = processes.split("\n").filter((line) => {
+    const command = line.trim().replace(/^\d+\s+/, "");
+    return command === executable || command.startsWith(`${executable} `);
+  });
+  if (running.length > 0) throw new Error(`refusing to overwrite running ${appName}: ${running.map((line) => line.trim()).join(", ")}`);
+};
+assertOutputStopped();
 if (!existsSync(SOURCE)) throw new Error(`source app not found: ${SOURCE}`);
 const version = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBundleShortVersionString"]).trim();
 const build = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBundleVersion"]).trim();
@@ -69,6 +77,7 @@ sh([
 ]);
 
 step(`APFS-clone app → build/${appName}.app`);
+assertOutputStopped();
 rmSync(OUT, { recursive: true, force: true });
 sh(["cp", "-cR", SOURCE, OUT]);
 sh(["xattr", "-cr", OUT], { quiet: true });
@@ -77,10 +86,11 @@ step("Info.plist: bundle id, display name, Sparkle off");
 const plist = join(OUT, "Contents/Info.plist");
 const plutil = (...args: string[]): string => sh(["plutil", ...args, plist]);
 plutil("-replace", "CFBundleIdentifier", "-string", MOD_BUNDLE_ID);
-plutil("-replace", "CFBundleDisplayName", "-string", validation ? "Arc Mod Test" : "Arc Mod");
+plutil("-replace", "CFBundleDisplayName", "-string", session.displayName);
 // Arc's Swift layer names its data folder after CFBundleName (~/Library/Application Support/<name>),
 // so this keeps the mod out of the real ~/Library/Application Support/Arc.
 plutil("-replace", "CFBundleName", "-string", appName);
+if (session.agent !== undefined) plutil("-insert", "ArcModAgentSession", "-string", session.agent);
 plutil("-insert", "ArcModLocalMode", "-bool", "YES");
 plutil("-insert", "ArcModHostResolverRules", "-string", hostResolverRules);
 plutil("-replace", "SUEnableAutomaticChecks", "-bool", "NO");
