@@ -22,23 +22,30 @@ including known failures. It is not a known-good shortcut baseline.
 - Six verified telemetry defaults are disabled while preserving unrelated overrides.
 - The finite local shortcut classifier and native menu-validation bridge are
   implemented and covered by native and binary tests.
+- Cmd+W removes loaded disposable unpinned tabs, and Cmd+Shift+T restores the closed
+  tab. The shared close helper previously rejected nil `currentUserID` derived from
+  `WindowsState.authSession`. A scoped bridge at `0x102a3ade8` supplies a native small
+  String only for that presence check, then resumes `0x102a3adec`. It preserves existing
+  nonnil IDs and leaves global account getters unchanged. The helper only releases
+  the fallback; it does not persist it or use it as an archive owner.
+- Cmd+[ and Cmd+] navigated between local fixture pages in the current mod. Back also
+  worked immediately after a failed close in the earlier build. No history patch was
+  needed for these checks.
 
 ## Open regressions
 
-- Cmd+W and the sidebar close control do not reliably close disposable unpinned tabs.
-  The native close action and close reducer are reached. The local menu classifier
-  accepts Cmd+W, so menu enablement alone does not fix the failure. Native selected
-  sidebar IDs and focused content associations are under investigation.
-- The user reports Cmd+[ and Cmd+] failing. History must be verified alongside
-  tab closing before claiming the shortcut audit is complete.
+- The broader audit of account-dependent local actions is ongoing. Direct sidebar
+  close controls and the complete shortcut inventory still need further live coverage.
 - The static inventory contains 89 native NIB bindings. It is an inventory, not
   evidence that every shortcut has passed live testing.
 
 ## Validation boundaries
 
-Typecheck, lint, ten Bun binary tests, native service-policy tests and native shortcut
-policy tests passed before this checkpoint. Build signing passed before launch.
-Do not describe those checks as proof of live tab closing or history behavior.
+Typecheck, lint, eleven Bun binary tests, native service-policy tests and native shortcut
+policy tests pass. The native ABI probe checks both Foundation formatting and the local
+close fallback String representation. Build signing passed before launch. A fresh
+read-only review verified bridge branches, register preservation, ownership and padding.
+Do not describe those checks as proof that every shortcut works.
 
 The back-forward-cache experiment did not produce persisted page restoration; no
 bfcache change is retained. Command-bar captures used different workloads and cannot

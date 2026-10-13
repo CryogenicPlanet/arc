@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { patchLocalMode } from "./patch-local-mode";
 import { hostResolverRules } from "./service-policy";
 import { shortcutBridge, shortcutBridgeOffset, shortcutBridgeSymbol } from "./shortcut-bridge";
+import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
 
 const binary = join(import.meta.dir, "../bin/Arc.arm64");
 describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () => {
@@ -16,8 +17,8 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(Bun.hash(original)).toBe(originalDigest);
     const changed: number[] = [];
     original.forEach((byte, i) => { if (byte !== patched[i]) changed.push(i); });
-    expect(changed.length).toBe(177);
-    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4))).toBe(true);
+    expect(changed.length).toBe(222);
+    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4))).toBe(true);
     // The new call must destroy the optional session, and the branch must reach local bootstrap.
     const target = (offset: number): number => {
       const immediate = patched.readUInt32LE(offset) & 0x3ffffff;
@@ -32,12 +33,23 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(target(0x31cb04)).toBe(0x31cb50);
     expect(target(0x1f5f7a0)).toBe(0x1f5f89c);
     expect(target(0x313cd0)).toBe(shortcutBridgeOffset);
+    expect(target(0x2a3ade8)).toBe(localCloseBridgeOffset);
+    expect(target(localCloseBridgeOffset + 4)).toBe(0x2a3adec);
+    expect(target(localCloseBridgeOffset + 40)).toBe(0x2a3adec);
     expect(target(shortcutBridgeOffset + 28)).toBe(0x733c);
     expect(target(shortcutBridgeOffset + 40)).toBe(0x35ad624);
     expect(target(shortcutBridgeOffset + 68)).toBe(0x313d0c);
     expect(target(shortcutBridgeOffset + 76)).toBe(0x313e74);
     expect(patched.subarray(0x31caf4, 0x31cb04)).toEqual(original.subarray(0x31caf4, 0x31cb04));
     expect(patched.subarray(0x2a7cb58, 0x2a7cb60)).toEqual(original.subarray(0x2a7cb58, 0x2a7cb60));
+  });
+
+  test("local close fallback keeps native cleanup and every global account getter intact", () => {
+    expect(patched.subarray(0x2a3add4, 0x2a3ade8)).toEqual(original.subarray(0x2a3add4, 0x2a3ade8));
+    expect(patched.subarray(0x2a3adec, 0x2a3b7a8)).toEqual(original.subarray(0x2a3adec, 0x2a3b7a8));
+    expect(patched.subarray(0x16f1c0, 0x16f324)).toEqual(original.subarray(0x16f1c0, 0x16f324));
+    expect(localCloseBridge.readUInt32LE(0)).toBe(0xb4000041);
+    expect(localCloseBridgeOffset + localCloseBridge.length).toBeLessThanOrEqual(0x3138);
   });
 
   test("shortcut bridge preserves shared state-failure cleanup and the first original instruction", () => {
@@ -78,7 +90,7 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
   });
 
   test("rejects drift in either performance fingerprint", () => {
-    for (const offset of [0xdab524, 0x1434264, 0x313cd0]) {
+    for (const offset of [0xdab524, 0x1434264, 0x313cd0, 0x2a3ade8]) {
       const mismatch = Buffer.from(original);
       mismatch[offset] = 0;
       const digest = Bun.hash(mismatch);

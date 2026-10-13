@@ -16,4 +16,8 @@ precondition(!encoded.contains(10))
 let decoded = try JSONDecoder().decode([String: [Int]].self, from: encoded)
 precondition(decoded == input)
 precondition(CKAccountStatus.couldNotDetermine.rawValue == 0)
-print("Foundation formatting ABI, compact JSON round-trip and unavailable CloudKit status: verified")
+var localCloseID = "arcmod-local"
+let expectedLocalID: [UInt8] = Array(localCloseID.utf8) + [0, 0, 0, 0xec]
+precondition(MemoryLayout<String>.size == 16)
+precondition(withUnsafeBytes(of: &localCloseID) { Array($0) } == expectedLocalID)
+print("Foundation formatting ABI, compact JSON, CloudKit status and local close String ABI: verified")

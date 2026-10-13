@@ -6,6 +6,7 @@
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortcutBridge, shortcutBridgeOffset } from "./shortcut-bridge";
+import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
 
 type Patch = { readonly address: bigint; readonly original: Buffer; readonly replacement: Buffer };
 const onboarding = Buffer.from("f44fbea9fd7b01a9fd430091f40300aaf30308aadbf7fc9700010036000080d23125fd97081480b9886a68381f010071e8079f1a020000142800805268020039fd7b41a9f44fc2a8c0035fd6", "hex");
@@ -68,6 +69,12 @@ localSettingsCloudStatus.set(Buffer.from("df8200f93f000014", "hex"), 0);
 const menuValidation = Buffer.from("e10c02f021002d91229801f042803991e0031baa96cdf39763000014", "hex");
 const localMenuValidation = Buffer.from(menuValidation);
 localMenuValidation.writeUInt32LE(branch(0x100313cd0n, 0x100000000n + BigInt(shortcutBridgeOffset)), 0);
+// Native shared tab closing checks currentUserID after resolving a valid local
+// window/sidebar container. Only that call site receives a stable local small
+// String when nil; no session, user object or global identity is created.
+const closeUserPresence = Buffer.from("e82640f9f40316aae00318aae10317aa00013fd6410700b4f40301aa61c20791795648a9e80315aa", "hex");
+const localCloseUserPresence = Buffer.from(closeUserPresence);
+localCloseUserPresence.writeUInt32LE(branch(0x102a3ade8n, 0x100000000n + BigInt(localCloseBridgeOffset)), 20);
 const patches: readonly Patch[] = [
   { address: 0x10186b3b0n, original: onboarding, replacement: localOnboarding },
   { address: windowAddress, original: Buffer.from("000080d2678f8697f40300aa08805ff8081940f9e00316aa21008052e20314aa00013fd61f04007101070054", "hex"), replacement: localWindow },
@@ -79,6 +86,8 @@ const patches: readonly Patch[] = [
   { address: 0x101f5f79cn, original: settingsCloudStatus, replacement: localSettingsCloudStatus },
   { address: 0x100313cd0n, original: menuValidation, replacement: localMenuValidation },
   { address: 0x100000000n + BigInt(shortcutBridgeOffset), original: Buffer.alloc(shortcutBridge.length), replacement: shortcutBridge },
+  { address: 0x102a3add4n, original: closeUserPresence, replacement: localCloseUserPresence },
+  { address: 0x100000000n + BigInt(localCloseBridgeOffset), original: Buffer.alloc(localCloseBridge.length), replacement: localCloseBridge },
 ];
 
 export const patchLocalMode = (source: Buffer): Buffer => {
