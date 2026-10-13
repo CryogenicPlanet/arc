@@ -1,0 +1,3102 @@
+[
+  {
+    "nibId": 33,
+    "title": "Show/Hide Sidebar",
+    "bindingId": "showSidebar",
+    "typeTravelId": "toggleSidebar",
+    "selector": "toggleArcSidebar:",
+    "target": "FirstResponder",
+    "keyEquivalent": "s",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+s",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "toggleSidebar",
+      "arcTypeTravelIcon": "sidebar.left",
+      "arcTypeTravelCandidateBump": 0.5,
+      "arcKeyBindingID": "showSidebar",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView",
+      "arcTypeTravelTriggers": "Toggle Sidebar;"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ddb4"
+      }
+    ],
+    "appKitShortcut": "Cmd+s",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 52,
+    "title": "New ChatGPT Message…",
+    "bindingId": "gptMessage",
+    "typeTravelId": null,
+    "selector": "gptMessage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "g",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+g",
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "gptMessage"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320a04"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+g",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "gptMessage",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 61,
+    "title": "Go Forward",
+    "bindingId": "goForward",
+    "typeTravelId": "goForward",
+    "selector": "navigateTabForward:",
+    "target": "FirstResponder",
+    "keyEquivalent": "]",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+]",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "goForward",
+      "arcTypeTravelIcon": "arrow.right",
+      "arcTypeTravelTriggers": "Go Forward; Forward; Navigate Forward",
+      "arcKeyBindingID": "goForward",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f87c"
+      }
+    ],
+    "appKitShortcut": "Cmd+]",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 93,
+    "title": "Zoom Out",
+    "bindingId": "zoomOut",
+    "typeTravelId": "zoomOut",
+    "selector": "zoomOut:",
+    "target": "FirstResponder",
+    "keyEquivalent": "-",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+-",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "zoomOut",
+      "arcTypeTravelIcon": "minus.magnifyingglass",
+      "arcKeyBindingID": "zoomOut"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d760"
+      }
+    ],
+    "appKitShortcut": "Cmd+-",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 134,
+    "title": "Collapse All Folders",
+    "bindingId": "collapseAllFolders",
+    "typeTravelId": null,
+    "selector": "collapseAllFolders:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "collapseAllFolders"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f990"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 142,
+    "title": "Rename Current Item",
+    "bindingId": "rename",
+    "typeTravelId": null,
+    "selector": "rename:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "rename"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003209b4"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 150,
+    "title": "View Downloads",
+    "bindingId": "viewDownloads",
+    "typeTravelId": "openDownloads",
+    "selector": "toggleDownloads:",
+    "target": "FirstResponder",
+    "keyEquivalent": "J",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+J",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "openDownloads",
+      "arcTypeTravelIcon": "arrow.down.circle",
+      "arcTypeTravelTriggers": "Downloads",
+      "arcTypeTravelDisregardCache": true,
+      "arcKeyBindingID": "viewDownloads"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320994"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+j",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 164,
+    "title": "Expand All Folders",
+    "bindingId": "expandAllFolders",
+    "typeTravelId": null,
+    "selector": "expandAllFolders:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "expandAllFolders"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031fab4"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 172,
+    "title": "Cycle Tab Backward",
+    "bindingId": "cycleTabBackward",
+    "typeTravelId": null,
+    "selector": "cycleTabBackward:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+Left",
+    "priority": "overrideWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "cycleTabBackward",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320a34"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Cmd+Left",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "cycleTabBackward",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 181,
+    "title": "Pin/Unpin Tab",
+    "bindingId": "pinTab",
+    "typeTravelId": "pinTab",
+    "selector": "toggleSelectedItemsPinned:",
+    "target": "FirstResponder",
+    "keyEquivalent": "d",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+d",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "pinTab",
+      "arcKeyBindingID": "pinTab",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView",
+      "arcTypeTravelIcon": "pin",
+      "arcTypeTravelTriggers": "save"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d630"
+      }
+    ],
+    "appKitShortcut": "Cmd+d",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 194,
+    "title": "Add Split View",
+    "bindingId": "addSplitView",
+    "typeTravelId": "addSplitView",
+    "selector": "addSplitPanel:",
+    "target": "FirstResponder",
+    "keyEquivalent": "=",
+    "modifierMask": 393216,
+    "defaultShortcut": "Shift+Ctrl+=",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "addSplitView",
+      "arcTypeTravelIcon": "square.split.2x1",
+      "arcTypeTravelTriggers": "Add Split View; Split View; Create Split View Pane; New Split View; Split",
+      "arcKeyBindingID": "addSplitView",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d2d0"
+      },
+      {
+        "class": "KeyboardShortcutsEDUWindowController",
+        "address": "0x101e98350"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+=",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 207,
+    "title": "Tab Switcher (backward)",
+    "bindingId": "cyclePreviousTab",
+    "typeTravelId": null,
+    "selector": "cycleToPreviousRecentTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "\u0019",
+    "modifierMask": 393216,
+    "defaultShortcut": "Shift+Ctrl+\u0019",
+    "priority": "overrideWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "cyclePreviousTab",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcTypeTravelTriggers": "Toggle Tabs; Switch tabs; Recent tabs"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f898"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+Tab",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 219,
+    "title": "Peek Email…",
+    "bindingId": "peekEmail",
+    "typeTravelId": null,
+    "selector": "peekEmail:",
+    "target": "FirstResponder",
+    "keyEquivalent": "E",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+E",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "peekEmail",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320a44"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+e",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "peekEmail",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 228,
+    "title": "Close this Split Pane",
+    "bindingId": "removeSplitView",
+    "typeTravelId": "removeSplitView",
+    "selector": "closeFocusedSplitViewPanel:",
+    "target": "FirstResponder",
+    "keyEquivalent": "-",
+    "modifierMask": 393216,
+    "defaultShortcut": "Shift+Ctrl+-",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "removeSplitView",
+      "arcTypeTravelIcon": "xmark.square",
+      "arcTypeTravelTriggers": "Close Split View",
+      "arcKeyBindingID": "removeSplitView",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d610"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+-",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 240,
+    "title": "Open Command Bar",
+    "bindingId": "addressBar",
+    "typeTravelId": null,
+    "selector": "toggleOpenOmnibox:",
+    "target": "FirstResponder",
+    "keyEquivalent": "l",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+l",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "addressBar",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ef74"
+      }
+    ],
+    "appKitShortcut": "Cmd+l",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 263,
+    "title": "Capture…",
+    "bindingId": "capturePage",
+    "typeTravelId": "capturePage",
+    "selector": "capturePage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "2",
+    "modifierMask": 1179648,
+    "defaultShortcut": "Shift+Cmd+2",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "capturePage",
+      "arcTypeTravelIcon": "camera",
+      "arcTypeTravelTriggers": "Capture; Screenshot; Snapshot; Cut Out;",
+      "arcKeyBindingID": "capturePage"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ce28"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+2",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "capturePage",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 285,
+    "title": "Developer Tools",
+    "bindingId": "developerTools_Alternate",
+    "typeTravelId": null,
+    "selector": "toggleDevTools:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "developerTools_Alternate",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "DevToolsWindowController",
+        "address": "0x1001a05e4"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d2e4"
+      }
+    ],
+    "appKitShortcut": "Cmd+F12",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 334,
+    "title": "Reset all tabs in this Space",
+    "bindingId": "resetSpace",
+    "typeTravelId": "expandPinnedTabs",
+    "selector": "resetVisiblePinnedTabs:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "expandPinnedTabs",
+      "arcTypeTravelIcon": "arrow.backward.to.line",
+      "arcKeyBindingID": "resetSpace"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320880"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 361,
+    "title": "Go Back",
+    "bindingId": "goBack_Alternate",
+    "typeTravelId": null,
+    "selector": "navigateTabBackArrow:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+Left",
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "goBack_Alternate"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f2f4"
+      }
+    ],
+    "appKitShortcut": "Cmd+Left",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 402,
+    "title": "Copy URL as Markdown",
+    "bindingId": "copyCurrentURLMarkdown",
+    "typeTravelId": "copyCurrentURLAsMarkdown",
+    "selector": "copyCurrentURLAsMarkdown:",
+    "target": "FirstResponder",
+    "keyEquivalent": "C",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+C",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "copyCurrentURLAsMarkdown",
+      "arcTypeTravelIcon": "doc.on.doc",
+      "arcTypeTravelTriggers": "Copy Link as Markdown; Copy Markdown",
+      "arcKeyBindingID": "copyCurrentURLMarkdown",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031db8c"
+      }
+    ],
+    "appKitShortcut": "Shift+Alt+Cmd+c",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 428,
+    "title": "Enter/Exit Full Screen",
+    "bindingId": "fullscreen",
+    "typeTravelId": "togglefullscreen",
+    "selector": "toggleFullScreen:",
+    "target": "FirstResponder",
+    "keyEquivalent": "f",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+f",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "togglefullscreen",
+      "arcTypeTravelIcon": "arrow.up.left.and.arrow.down.right",
+      "arcTypeTravelTriggers": "Enter Full Screen; Exit Full Screen; Full Screen; Toggle Full Screen",
+      "arcTypeTravelDisregardCache": true,
+      "arcKeyBindingID": "fullscreen",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "LittleBrowserWindow",
+        "address": "0x1002c2f7c"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Cmd+f",
+    "handlerFamily": "AppKit window/application",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 451,
+    "title": "View Library",
+    "bindingId": "viewLibrary",
+    "typeTravelId": "openLibrary",
+    "selector": "toggleLibrary:",
+    "target": "FirstResponder",
+    "keyEquivalent": "L",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+L",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "openLibrary",
+      "arcTypeTravelIcon": "archivebox",
+      "arcTypeTravelTriggers": "Library",
+      "arcTypeTravelDisregardCache": true,
+      "arcKeyBindingID": "viewLibrary"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320984"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+l",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 463,
+    "title": "New Little Arc Window",
+    "bindingId": "showLittleArc",
+    "typeTravelId": "newLittleBrowserWindow",
+    "selector": "newLittleBrowserWindow:",
+    "target": {
+      "id": 1527,
+      "class": "NSClassSwapper",
+      "NSClassName": "_TtC3Arc11AppDelegate",
+      "NSOriginalClassName": "NSObject",
+      "NSInitializeWithInit": true
+    },
+    "keyEquivalent": "n",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+n",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newLittleBrowserWindow",
+      "arcTypeTravelIcon": "macwindow.on.rectangle",
+      "arcTypeTravelTriggers": "Quick Lookup, Mini Window, Floating Window",
+      "arcKeyBindingID": "showLittleArc",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x100236518"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+n",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "showLittleArc",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 477,
+    "title": "Hide Arc",
+    "bindingId": "hideArc",
+    "typeTravelId": "hideArc",
+    "selector": "hide:",
+    "target": "FirstResponder",
+    "keyEquivalent": "h",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+h",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "hideArc",
+      "arcTypeTravelIcon": "macwindow",
+      "arcTypeTravelTriggers": "Hide Arc",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcKeyBindingID": "hideArc"
+    },
+    "handlers": [],
+    "appKitShortcut": "Cmd+h",
+    "handlerFamily": "AppKit window/application",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 487,
+    "title": "Find Previous",
+    "bindingId": "findPrevious",
+    "typeTravelId": "findPrevious",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "G",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+G",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "findPrevious",
+      "arcTypeTravelIcon": "arrow.left",
+      "arcTypeTravelTriggers": "Previous",
+      "arcKeyBindingID": "findPrevious"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+g",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 3,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 498,
+    "title": "Clear Unpinned Tabs",
+    "bindingId": "clearExplore",
+    "typeTravelId": "clearUnpinnedTabs",
+    "selector": "clearExplore:",
+    "target": "FirstResponder",
+    "keyEquivalent": "K",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+K",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "clearUnpinnedTabs",
+      "arcTypeTravelIcon": "bubbles.and.sparkles",
+      "arcTypeTravelTriggers": "Close Unpinned Tabs; Clear Tabs; Clear Today",
+      "arcKeyBindingID": "clearExplore"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10032052c"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+k",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 512,
+    "title": "Stop Loading",
+    "bindingId": "stopLoading",
+    "typeTravelId": null,
+    "selector": "stopLoadingCurrentTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": ".",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+.",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "stopLoading"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003209c4"
+      }
+    ],
+    "appKitShortcut": "Cmd+.",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 521,
+    "title": "Network Inspector",
+    "bindingId": "networkInspector",
+    "typeTravelId": "networkInspector",
+    "selector": "networkInspector:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "networkInspector",
+      "arcTypeTravelIcon": "wifi",
+      "arcTypeTravelTriggers": "Network Inspector;",
+      "arcKeyBindingID": "networkInspector"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d32c"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 543,
+    "title": "Jump to Selection",
+    "bindingId": "jumpToSelection",
+    "typeTravelId": "jumpToSelection",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "j",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+j",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "jumpToSelection",
+      "arcTypeTravelIcon": "arrow.turn.right.down",
+      "arcTypeTravelTriggers": "Jump to Selected; Selection",
+      "arcKeyBindingID": "jumpToSelection"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": "Cmd+j",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 554,
+    "title": "Manage Spaces…",
+    "bindingId": "openSpaceManager",
+    "typeTravelId": "openSpaceManager",
+    "selector": "toggleSpaceManager:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "openSpaceManager",
+      "arcTypeTravelIcon": "rectangle.portrait.on.rectangle.portrait",
+      "arcTypeTravelTriggers": "Space Management; Organize; Toggle Space Manager; View Spaces",
+      "arcKeyBindingID": "openSpaceManager"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d2a8"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 566,
+    "title": "Duplicate",
+    "bindingId": "duplicate",
+    "typeTravelId": null,
+    "selector": "duplicate:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "duplicate"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003209a4"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 574,
+    "title": "Close Window",
+    "bindingId": "closeWindow",
+    "typeTravelId": "closeWindow",
+    "selector": "closeWindow:",
+    "target": "FirstResponder",
+    "keyEquivalent": "W",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+W",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "closeWindow",
+      "arcTypeTravelIcon": "xmark.circle",
+      "arcTypeTravelTriggers": "Exit Window",
+      "arcKeyBindingID": "closeWindow",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ed38"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+w",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 602,
+    "title": "Share…",
+    "bindingId": "share",
+    "typeTravelId": "share",
+    "selector": "share:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "share",
+      "arcTypeTravelIcon": "square.and.arrow.up",
+      "arcTypeTravelTriggers": "Share",
+      "arcKeyBindingID": "share",
+      "arcTypeTravelTitle": "Share URL"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031a840"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 655,
+    "title": "View Source",
+    "bindingId": "viewSource",
+    "typeTravelId": "viewSource",
+    "selector": "viewSource:",
+    "target": "FirstResponder",
+    "keyEquivalent": "u",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+u",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "viewSource",
+      "arcTypeTravelIcon": "curlybraces",
+      "arcTypeTravelTriggers": "View Source;",
+      "arcKeyBindingID": "viewSource",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d2fc"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+u",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 678,
+    "title": "New Window",
+    "bindingId": "newWindow",
+    "typeTravelId": "newWindow",
+    "selector": "newWindow:",
+    "target": {
+      "id": 1527,
+      "class": "NSClassSwapper",
+      "NSClassName": "_TtC3Arc11AppDelegate",
+      "NSOriginalClassName": "NSObject",
+      "NSInitializeWithInit": true
+    },
+    "keyEquivalent": "n",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+n",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newWindow",
+      "arcTypeTravelIcon": "plus.rectangle",
+      "arcTypeTravelTriggers": "Create Window; Copy Window; Duplicate Window",
+      "arcKeyBindingID": "newWindow",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x100236230"
+      }
+    ],
+    "appKitShortcut": "Cmd+n",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newWindow",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 690,
+    "title": "New Note",
+    "bindingId": "newNote",
+    "typeTravelId": "newNote",
+    "selector": "newNote:",
+    "target": "FirstResponder",
+    "keyEquivalent": "N",
+    "modifierMask": 262144,
+    "defaultShortcut": "Ctrl+N",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newNote",
+      "arcTypeTravelIcon": "note.text",
+      "arcTypeTravelTriggers": "Create Note; Note; Scratchpad",
+      "arcKeyBindingID": "newNote",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031b690"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+n",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newNoteMenuItem",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 704,
+    "title": "Refresh the Page",
+    "bindingId": "reloadPage",
+    "typeTravelId": "reloadPage",
+    "selector": "reloadPage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "r",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+r",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "reloadPage",
+      "arcTypeTravelIcon": "arrow.clockwise",
+      "arcTypeTravelTriggers": "Reload Page",
+      "arcKeyBindingID": "reloadPage"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ef8c"
+      }
+    ],
+    "appKitShortcut": "Cmd+r",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 717,
+    "title": "Restore Last Closed Tab",
+    "bindingId": "reopenLastClosedTab",
+    "typeTravelId": "reopenClosedTab",
+    "selector": "reopenLastTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "T",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+T",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "reopenClosedTab",
+      "arcTypeTravelIcon": "arrow.uturn.backward",
+      "arcTypeTravelTriggers": "Reopen Closed Tab",
+      "arcKeyBindingID": "reopenLastClosedTab",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ce10"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+t",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 731,
+    "title": "Hide Other Windows",
+    "bindingId": "hideOthers",
+    "typeTravelId": "hideOthers",
+    "selector": "hideOtherApplications:",
+    "target": "FirstResponder",
+    "keyEquivalent": "h",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+h",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "hideOthers",
+      "arcTypeTravelIcon": "macwindow",
+      "arcTypeTravelTriggers": "Hide Others",
+      "arcKeyBindingID": "hideOthers"
+    },
+    "handlers": [],
+    "appKitShortcut": "Alt+Cmd+h",
+    "handlerFamily": "AppKit window/application",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 740,
+    "title": "Paste and Match Style",
+    "bindingId": "pasteAndMatchStyle",
+    "typeTravelId": "pasteAndMatchStyle",
+    "selector": "pasteAsPlainText:",
+    "target": "FirstResponder",
+    "keyEquivalent": "V",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+V",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "pasteAndMatchStyle",
+      "arcTypeTravelIcon": "list.clipboard",
+      "arcTypeTravelTriggers": "Paste Without Formatting",
+      "arcKeyBindingID": "pasteAndMatchStyle"
+    },
+    "handlers": [],
+    "appKitShortcut": "Shift+Cmd+v",
+    "handlerFamily": "FirstResponder/AppKit",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 752,
+    "title": "Reveal Tab in Sidebar",
+    "bindingId": "revealTabInSidebar",
+    "typeTravelId": "revealTabInSidebar",
+    "selector": "revealCurrentTabInSidebar:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "revealTabInSidebar",
+      "arcTypeTravelIcon": "arrow.left.circle",
+      "arcTypeTravelTriggers": "Show Tab in Sidebar; Reveal in Sidebar; Go to Current Tab",
+      "arcKeyBindingID": "revealTabInSidebar"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003208ec"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 764,
+    "title": "Zoom to Actual Size",
+    "bindingId": "resetZoom",
+    "typeTravelId": "actualSize",
+    "selector": "resetZoom:",
+    "target": "FirstResponder",
+    "keyEquivalent": "0",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+0",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "actualSize",
+      "arcTypeTravelIcon": "magnifyingglass",
+      "arcTypeTravelTriggers": "Reset Zoom",
+      "arcKeyBindingID": "resetZoom"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d644"
+      }
+    ],
+    "appKitShortcut": "Cmd+0",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 778,
+    "title": "Reveal Current Tab",
+    "bindingId": "focusSidebar",
+    "typeTravelId": "focusSidebar",
+    "selector": "focusSidebar:",
+    "target": "FirstResponder",
+    "keyEquivalent": " ",
+    "modifierMask": 262144,
+    "defaultShortcut": "Ctrl+Space",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "focusSidebar",
+      "arcTypeTravelIcon": "sidebar.left",
+      "arcTypeTravelCandidateBump": 0.5,
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView",
+      "arcKeyBindingID": "focusSidebar"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ce20"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Space",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 799,
+    "title": "Find…",
+    "bindingId": "find",
+    "typeTravelId": "find",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "f",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+f",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "find",
+      "arcTypeTravelIcon": "magnifyingglass",
+      "arcTypeTravelTriggers": "Find in Page",
+      "arcKeyBindingID": "find"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": "Cmd+f",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 1,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 808,
+    "title": "Next Space",
+    "bindingId": "focusNextSpace",
+    "typeTravelId": "nextSpace",
+    "selector": "nextSpace:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+Right",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "nextSpace",
+      "arcTypeTravelIcon": "arrow.right.to.line",
+      "arcTypeTravelTriggers": "Focus Next Space",
+      "arcKeyBindingID": "focusNextSpace"
+    },
+    "handlers": [
+      {
+        "class": "BrowserWindow",
+        "address": "0x10014fcec"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+Right",
+    "handlerFamily": "BrowserWindow",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 822,
+    "title": "Find and Replace",
+    "bindingId": "findAndReplace",
+    "typeTravelId": "findAndReplace",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "f",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+f",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "findAndReplace",
+      "arcTypeTravelIcon": "magnifyingglass",
+      "arcKeyBindingID": "findAndReplace"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+f",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 12,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 830,
+    "title": "New Tab…",
+    "bindingId": "newTab",
+    "typeTravelId": null,
+    "selector": "newWindowForTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "t",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+t",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "newTab",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x100233044"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031cd80"
+      },
+      {
+        "class": "KeyboardShortcutsEDUWindowController",
+        "address": "0x101e982a4"
+      },
+      {
+        "class": "ImportDialogSheetWindow",
+        "address": "0x10225cd70"
+      },
+      {
+        "class": "PasswordImportPromptSheetWindow",
+        "address": "0x10225cd74"
+      },
+      {
+        "class": "ReferralCodeDialogSheetWindow",
+        "address": "0x102d6635c"
+      }
+    ],
+    "appKitShortcut": "Cmd+t",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newTabMenuItem",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 852,
+    "title": "Previous Tab",
+    "bindingId": "selectPreviousTab",
+    "typeTravelId": "previousTab",
+    "selector": "previousTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+Up",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "previousTab",
+      "arcKeyBindingID": "selectPreviousTab",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcTypeTravelIcon": "arrow.left"
+    },
+    "handlers": [
+      {
+        "class": "BrowserWindow",
+        "address": "0x10014fb9c"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+Up",
+    "handlerFamily": "BrowserWindow",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 871,
+    "title": "Cycle Tab Forward",
+    "bindingId": "cycleTabForward",
+    "typeTravelId": null,
+    "selector": "cycleTabForward:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+Right",
+    "priority": "overrideWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "cycleTabForward",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320a24"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Cmd+Right",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "cycleTabForward",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 890,
+    "title": "Copy URL",
+    "bindingId": "copyCurrentURL",
+    "typeTravelId": "copyCurrentURL",
+    "selector": "copyCurrentURL:",
+    "target": "FirstResponder",
+    "keyEquivalent": "C",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+C",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "copyCurrentURL",
+      "arcTypeTravelIcon": "doc.on.doc",
+      "arcTypeTravelTriggers": "Copy URL; Copy Link",
+      "arcKeyBindingID": "copyCurrentURL",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031db84"
+      },
+      {
+        "class": "KeyboardShortcutsEDUWindowController",
+        "address": "0x101e98340"
+      },
+      {
+        "class": "CommandBarInputContainer",
+        "address": "0x1021ef450"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+c",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 901,
+    "title": "Print",
+    "bindingId": "printPage",
+    "typeTravelId": "printPage",
+    "selector": "printPage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "p",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+p",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "printPage",
+      "arcTypeTravelIcon": "printer",
+      "arcTypeTravelTriggers": "Print Page",
+      "arcKeyBindingID": "printPage",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031a850"
+      }
+    ],
+    "appKitShortcut": "Cmd+p",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 914,
+    "title": "Capture in Portrait Mode",
+    "bindingId": "capturePrettyScreenshot",
+    "typeTravelId": "capturePrettyScreenshot",
+    "selector": "capturePrettyScreenshot:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "capturePrettyScreenshot",
+      "arcTypeTravelIcon": "camera.macro",
+      "arcTypeTravelTriggers": "Screenshot in Portrait Mode; Capture Portrait; Portrait Mode; Screenshot",
+      "arcKeyBindingID": "capturePrettyScreenshot"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031cef4"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "capturePrettyScreenshot",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 926,
+    "title": "Use Selection to Find",
+    "bindingId": "useSelectionForFind",
+    "typeTravelId": "useSelectionForFind",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "useSelectionForFind",
+      "arcTypeTravelIcon": "magnifyingglass",
+      "arcTypeTravelTriggers": "Find Selection; Find Selected",
+      "arcKeyBindingID": "useSelectionForFind"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 7,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 935,
+    "title": "View Archive",
+    "bindingId": "viewArchive",
+    "typeTravelId": "viewArchive",
+    "selector": "showArchive:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "viewArchive",
+      "arcTypeTravelIcon": "archivebox",
+      "arcTypeTravelDisregardCache": true,
+      "arcKeyBindingID": "viewArchive",
+      "arcTypeTravelTriggers": "Archive"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003200d0"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 946,
+    "title": "Go Back",
+    "bindingId": "goBack",
+    "typeTravelId": "back",
+    "selector": "navigateTabBack:",
+    "target": "FirstResponder",
+    "keyEquivalent": "[",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+[",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "back",
+      "arcTypeTravelIcon": "arrow.backward",
+      "arcTypeTravelTriggers": "Go Back; Back; Navigate Back",
+      "arcKeyBindingID": "goBack",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f324"
+      }
+    ],
+    "appKitShortcut": "Cmd+[",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 959,
+    "title": "New Folder…",
+    "bindingId": "newFolder",
+    "typeTravelId": null,
+    "selector": "newList:",
+    "target": "FirstResponder",
+    "keyEquivalent": "N",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+N",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "newFolder"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f988"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+n",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newListMenuItem",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 968,
+    "title": "Archive Tab",
+    "bindingId": "archiveTab",
+    "typeTravelId": "archiveTab",
+    "selector": "closeCurrentItem:",
+    "target": "FirstResponder",
+    "keyEquivalent": "w",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+w",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "archiveTab",
+      "arcTypeTravelIcon": "archivebox",
+      "arcTypeTravelTriggers": "Exit Tab; Unload; Deselect; Close",
+      "arcKeyBindingID": "archiveTab",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "GitHubParserDebugWindowController",
+        "address": "0x1000f958c"
+      },
+      {
+        "class": "DevToolsWindowController",
+        "address": "0x1001a05e0"
+      },
+      {
+        "class": "BrowserExtensionWindowController",
+        "address": "0x1001dca3c"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ece0"
+      },
+      {
+        "class": "LifetimeTrackerUIManager",
+        "address": "0x100e60d64"
+      },
+      {
+        "class": "UnboxingWindowController",
+        "address": "0x10186aa08"
+      },
+      {
+        "class": "KeyboardShortcutsEDUWindowController",
+        "address": "0x101e9824c"
+      },
+      {
+        "class": "UpdaterWindowController",
+        "address": "0x101f0eb98"
+      },
+      {
+        "class": "SettingsWindowController",
+        "address": "0x102009894"
+      },
+      {
+        "class": "CommandBarDebugWindowController",
+        "address": "0x1021e08f4"
+      },
+      {
+        "class": "TracingWindowController",
+        "address": "0x102d799f4"
+      },
+      {
+        "class": "TCAActionInspectorDashboardController",
+        "address": "0x102ec3fa0"
+      }
+    ],
+    "appKitShortcut": "Cmd+w",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 988,
+    "title": "Quit Arc",
+    "bindingId": "quitArc",
+    "typeTravelId": "quitArc",
+    "selector": "userQuitApp:",
+    "target": "FirstResponder",
+    "keyEquivalent": "q",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+q",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "quitArc",
+      "arcTypeTravelIcon": "hand.wave",
+      "arcTypeTravelTriggers": "Quit App",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcKeyBindingID": "quitArc"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x100231aac"
+      }
+    ],
+    "appKitShortcut": "Cmd+q",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 999,
+    "title": "Minimize Window",
+    "bindingId": "minimize",
+    "typeTravelId": "minimize",
+    "selector": "performMiniaturize:",
+    "target": "FirstResponder",
+    "keyEquivalent": "m",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+m",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "minimize",
+      "arcTypeTravelIcon": "arrow.down.right.and.arrow.up.left",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcKeyBindingID": "minimize"
+    },
+    "handlers": [],
+    "appKitShortcut": "Cmd+m",
+    "handlerFamily": "AppKit window/application",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1009,
+    "title": "Preferences…",
+    "bindingId": "viewPreferences",
+    "typeTravelId": null,
+    "selector": "showPreferences:",
+    "target": {
+      "id": 1527,
+      "class": "NSClassSwapper",
+      "NSClassName": "_TtC3Arc11AppDelegate",
+      "NSOriginalClassName": "NSObject",
+      "NSInitializeWithInit": true
+    },
+    "keyEquivalent": ",",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+,",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "viewPreferences"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x100236754"
+      }
+    ],
+    "appKitShortcut": "Cmd+,",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1018,
+    "title": "Tab Switcher (forward)",
+    "bindingId": "cycleNextTab",
+    "typeTravelId": null,
+    "selector": "cycleToNextRecentTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "\t",
+    "modifierMask": 262144,
+    "defaultShortcut": "Ctrl+Tab",
+    "priority": "overrideWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "cycleNextTab",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcTypeTravelTriggers": "Toggle Tabs; Switch tabs; Recent tabs"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f8a0"
+      },
+      {
+        "class": "KeyboardShortcutsEDUWindowController",
+        "address": "0x101e98348"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Tab",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1029,
+    "title": "New Incognito Window",
+    "bindingId": "newIncognitoWindow",
+    "typeTravelId": "newIncognitoWindow",
+    "selector": "newIncognitoWindow:",
+    "target": {
+      "id": 1527,
+      "class": "NSClassSwapper",
+      "NSClassName": "_TtC3Arc11AppDelegate",
+      "NSOriginalClassName": "NSObject",
+      "NSInitializeWithInit": true
+    },
+    "keyEquivalent": "N",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+N",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newIncognitoWindow",
+      "arcTypeTravelIcon": "macwindow.on.rectangle",
+      "arcTypeTravelTriggers": "Create Incognito Window; New Private Window; Incognito",
+      "arcKeyBindingID": "newIncognitoWindow",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x1002363e4"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+n",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newIncognitoWindowMenuItemId",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1039,
+    "title": "Force Refresh the Page",
+    "bindingId": "forceReloadPage",
+    "typeTravelId": "forceReloadPage",
+    "selector": "forceReloadPage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "R",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+R",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "forceReloadPage",
+      "arcTypeTravelTriggers": "Force Reload; Force Refresh",
+      "arcTypeTravelID": "forceReloadPage",
+      "arcTypeTravelIcon": "arrow.clockwise"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f1dc"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+r",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1051,
+    "title": "Zoom In",
+    "bindingId": "zoomIn",
+    "typeTravelId": "zoomIn",
+    "selector": "zoomIn:",
+    "target": "FirstResponder",
+    "keyEquivalent": "+",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd++",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "zoomIn",
+      "arcTypeTravelIcon": "plus.magnifyingglass",
+      "arcKeyBindingID": "zoomIn"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d65c"
+      }
+    ],
+    "appKitShortcut": "Cmd++",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1095,
+    "title": "Show/Hide Toolbar",
+    "bindingId": "toggleToolbar",
+    "typeTravelId": "toggleToolbar",
+    "selector": "toggleArcToolbar:",
+    "target": "FirstResponder",
+    "keyEquivalent": "D",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+D",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "toggleToolbar",
+      "arcTypeTravelTriggers": "Toggle Hide Show Toolbar;",
+      "arcTypeTravelIcon": "rectangle.topthird.inset.filled",
+      "arcKeyBindingID": "toggleToolbar",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ddc4"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+d",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1108,
+    "title": "Previous Space",
+    "bindingId": "focusPreviousSpace",
+    "typeTravelId": "previousSpace",
+    "selector": "previousSpace:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+Left",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "previousSpace",
+      "arcTypeTravelIcon": "arrow.left.to.line",
+      "arcTypeTravelTriggers": "Focus Previous Space",
+      "arcKeyBindingID": "focusPreviousSpace"
+    },
+    "handlers": [
+      {
+        "class": "BrowserWindow",
+        "address": "0x10014fcf4"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+Left",
+    "handlerFamily": "BrowserWindow",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1136,
+    "title": "Join Meeting",
+    "bindingId": "joinLiveMeeting",
+    "typeTravelId": null,
+    "selector": "joinLiveMeeting:",
+    "target": "FirstResponder",
+    "keyEquivalent": "j",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+j",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "joinLiveMeeting",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x100320a14"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Cmd+j",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "joinLiveMeeting",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1144,
+    "title": "View History",
+    "bindingId": "viewHistory",
+    "typeTravelId": "history",
+    "selector": "showAllHistory:",
+    "target": "FirstResponder",
+    "keyEquivalent": "y",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+y",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "history",
+      "arcTypeTravelIcon": "book",
+      "arcTypeTravelTriggers": "Show History; History",
+      "arcKeyBindingID": "viewHistory"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003200c4"
+      }
+    ],
+    "appKitShortcut": "Cmd+y",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1171,
+    "title": "Clear Archive",
+    "bindingId": "clearArchive",
+    "typeTravelId": "clearArchive",
+    "selector": "clearArchive:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "clearArchive",
+      "arcTypeTravelIcon": "archivebox",
+      "arcKeyBindingID": "clearArchive",
+      "arcTypeTravelTriggers": "Clear Archive; Delete Archive"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x1003200d8"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1195,
+    "title": "New Space…",
+    "bindingId": "newSpace",
+    "typeTravelId": "newSpace",
+    "selector": "newSpace:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newSpace",
+      "arcTypeTravelIcon": "plus.rectangle.portrait",
+      "arcTypeTravelTriggers": "Create New Space",
+      "arcKeyBindingID": "newSpace"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031fac4"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1207,
+    "title": "Save Page As",
+    "bindingId": "savePageAs",
+    "typeTravelId": "save",
+    "selector": "save:",
+    "target": "FirstResponder",
+    "keyEquivalent": "S",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+S",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "save",
+      "arcTypeTravelIcon": "square.and.arrow.down",
+      "arcTypeTravelTriggers": "Save Page; Save File",
+      "arcKeyBindingID": "savePageAs"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031a8dc"
+      },
+      {
+        "class": "EaselCanvasViewController(EaselUI)",
+        "address": "0x101be24ac"
+      }
+    ],
+    "appKitShortcut": "Shift+Cmd+s",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1220,
+    "title": "New Note (in Split)",
+    "bindingId": "newNoteInSplitView",
+    "typeTravelId": "newNoteInSplitView",
+    "selector": "newNoteInSplitView:",
+    "target": "FirstResponder",
+    "keyEquivalent": "n",
+    "modifierMask": 786432,
+    "defaultShortcut": "Ctrl+Alt+n",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newNoteInSplitView",
+      "arcTypeTravelIcon": "note.text",
+      "arcTypeTravelTriggers": "Create Note in Split View; Note Split; Scratchpad Split",
+      "arcTypeTravelCandidateBump": 0.9,
+      "arcKeyBindingID": "newNoteInSplitView",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031b6a0"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Alt+n",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newNoteInSplitView",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1242,
+    "title": "Capture Full Page",
+    "bindingId": "captureFullPage",
+    "typeTravelId": "captureFullPage",
+    "selector": "captureFullPage:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "captureFullPage",
+      "arcTypeTravelIcon": "newspaper",
+      "arcTypeTravelTriggers": "Full Page Capture; Capture Entire Page; Screenshot Full Page; Capture Full Page; Screenshot",
+      "arcKeyBindingID": "captureFullPage"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ce34"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "captureFullPage",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1254,
+    "title": "Find Next",
+    "bindingId": "findNext",
+    "typeTravelId": "findNext",
+    "selector": "arc_performFindPanelAction:",
+    "target": "FirstResponder",
+    "keyEquivalent": "g",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+g",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "findNext",
+      "arcTypeTravelIcon": "arrow.right",
+      "arcTypeTravelTriggers": "Next",
+      "arcKeyBindingID": "findNext"
+    },
+    "handlers": [
+      {
+        "class": "CommandFTextField",
+        "address": "0x100107ea0"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ea9c"
+      },
+      {
+        "class": "FindInPageView",
+        "address": "0x10032a81c"
+      },
+      {
+        "class": "TextEditorViewController",
+        "address": "0x101e55ac8"
+      }
+    ],
+    "appKitShortcut": "Cmd+g",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 2,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1263,
+    "title": "New Easel",
+    "bindingId": "newEasel",
+    "typeTravelId": "newEasel",
+    "selector": "newEasel:",
+    "target": "FirstResponder",
+    "keyEquivalent": "E",
+    "modifierMask": 262144,
+    "defaultShortcut": "Ctrl+E",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "newEasel",
+      "arcTypeTravelIcon": "scribble.variable",
+      "arcTypeTravelTriggers": "Mood Board",
+      "arcKeyBindingID": "newEasel"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031b6b0"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+e",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "service-linked: classify before enabling",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newEaselMenuItemId",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1276,
+    "title": "Toggle Developer Mode",
+    "bindingId": "toggleDeveloperMode",
+    "typeTravelId": "toggleDeveloperMode",
+    "selector": "toggleDeveloperMode:",
+    "target": "FirstResponder",
+    "keyEquivalent": "d",
+    "modifierMask": 262144,
+    "defaultShortcut": "Ctrl+d",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "toggleDeveloperMode",
+      "arcTypeTravelIcon": "hammer.fill",
+      "arcTypeTravelTriggers": "Developer Mode; Enable Developer Mode; Disable Developer Mode;",
+      "arcKeyBindingID": "toggleDeveloperMode",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d5c4"
+      }
+    ],
+    "appKitShortcut": "Ctrl+d",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1300,
+    "title": "Separate Page from Split View",
+    "bindingId": "separateTabFromSplitView",
+    "typeTravelId": "separateTabFromSplitView",
+    "selector": "separateTabFromSplitView:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "separateTabFromSplitView",
+      "arcTypeTravelIcon": "scissors",
+      "arcTypeTravelTriggers": "Separate from split view; separate tab",
+      "arcKeyBindingID": "separateTabFromSplitView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d620"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1312,
+    "title": "JavaScript Console",
+    "bindingId": "javaScriptConsole",
+    "typeTravelId": "javaScriptConsole",
+    "selector": "javaScriptConsole:",
+    "target": "FirstResponder",
+    "keyEquivalent": "j",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+j",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "javaScriptConsole",
+      "arcTypeTravelIcon": "terminal",
+      "arcTypeTravelTriggers": "Toggle console; Console; Javascript Console; JS console",
+      "arcKeyBindingID": "javaScriptConsole"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d314"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+j",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1324,
+    "title": "Exit",
+    "bindingId": "exit",
+    "typeTravelId": "exit",
+    "selector": "exit:",
+    "target": "FirstResponder",
+    "keyEquivalent": "\u001b",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+Escape",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "exit",
+      "arcTypeTravelIcon": "escape",
+      "arcTypeTravelTriggers": "Exit; Exit Modal; Exit Full Screen",
+      "arcTypeTravelDisregardCache": true,
+      "arcKeyBindingID": "exit",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031ddf4"
+      }
+    ],
+    "appKitShortcut": "Cmd+Escape",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1348,
+    "title": "Reset Tab to Original URL",
+    "bindingId": "resetTab",
+    "typeTravelId": null,
+    "selector": "resetTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "resetTab",
+      "arcTypeTravelTriggers": "Reset Tab;"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031cfe0"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1371,
+    "title": "Cast",
+    "bindingId": "cast",
+    "typeTravelId": "cast",
+    "selector": "cast:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1048576,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "cast",
+      "arcKeyBindingID": "cast",
+      "arcTypeTravelIcon": "rectangle.portrait.and.arrow.right.fill"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d774"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1380,
+    "title": "Inspect Elements",
+    "bindingId": "inspectElements",
+    "typeTravelId": "inspectElements",
+    "selector": "inspectElements:",
+    "target": "FirstResponder",
+    "keyEquivalent": "c",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+c",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "inspectElements",
+      "arcTypeTravelIcon": "scope",
+      "arcTypeTravelTriggers": "Inspect Element;",
+      "arcKeyBindingID": "inspectElements",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d5dc"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+c",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1402,
+    "title": "Next Tab",
+    "bindingId": "selectNextTab",
+    "typeTravelId": "nextTab",
+    "selector": "nextTab:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+Down",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "nextTab",
+      "arcKeyBindingID": "selectNextTab",
+      "arcKeyBindingPriority": "overrideWebView",
+      "arcTypeTravelIcon": "arrow.right"
+    },
+    "handlers": [
+      {
+        "class": "BrowserWindow",
+        "address": "0x10014fba4"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+Down",
+    "handlerFamily": "BrowserWindow",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1412,
+    "title": "Copy URL as Quote",
+    "bindingId": "copyCurrentURLAsQuote",
+    "typeTravelId": "copyCurrentURLAsQuote",
+    "selector": "copyCurrentURLAsQuote:",
+    "target": "FirstResponder",
+    "keyEquivalent": "C",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+C",
+    "priority": "overrideWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "copyCurrentURLAsQuote",
+      "arcTypeTravelIcon": "quote.bubble",
+      "arcTypeTravelTriggers": "Copy URL as Quote; Copy Quote; Copy Link to Highlight",
+      "arcKeyBindingID": "copyCurrentURLAsQuote",
+      "arcKeyBindingPriority": "overrideWebView"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031dd38"
+      }
+    ],
+    "appKitShortcut": "Shift+Ctrl+Cmd+c",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1436,
+    "title": "Clear Cookies and Refresh",
+    "bindingId": "clearCookies",
+    "typeTravelId": "clearCookies",
+    "selector": "clearCookiesAndRefresh:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 0,
+    "defaultShortcut": null,
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "clearCookies",
+      "arcTypeTravelTriggers": "Clear Cookies",
+      "arcTypeTravelID": "clearCookies",
+      "arcTypeTravelIcon": "trash"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f1fc"
+      }
+    ],
+    "appKitShortcut": null,
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1447,
+    "title": "Go Forward",
+    "bindingId": "goForward_Alternate",
+    "typeTravelId": null,
+    "selector": "navigateTabForwardArrow:",
+    "target": "FirstResponder",
+    "keyEquivalent": "",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+Right",
+    "priority": "low",
+    "hidden": true,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "goForward_Alternate"
+    },
+    "handlers": [
+      {
+        "class": "MainWindowController",
+        "address": "0x10031f588"
+      }
+    ],
+    "appKitShortcut": "Cmd+Right",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1473,
+    "title": "Developer Tools",
+    "bindingId": "developerTools",
+    "typeTravelId": "devTools",
+    "selector": "toggleDevTools:",
+    "target": "FirstResponder",
+    "keyEquivalent": "i",
+    "modifierMask": 1572864,
+    "defaultShortcut": "Alt+Cmd+i",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "devTools",
+      "arcTypeTravelIcon": "hammer.fill",
+      "arcTypeTravelTriggers": "Developer Tools; Debug Tools; Devtools",
+      "arcKeyBindingID": "developerTools",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "DevToolsWindowController",
+        "address": "0x1001a05e4"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x10031d2e4"
+      }
+    ],
+    "appKitShortcut": "Alt+Cmd+i",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1485,
+    "title": "Blank Window",
+    "bindingId": "newBlankWindow",
+    "typeTravelId": "blankWindow",
+    "selector": "blankWindow:",
+    "target": {
+      "id": 1527,
+      "class": "NSClassSwapper",
+      "NSClassName": "_TtC3Arc11AppDelegate",
+      "NSOriginalClassName": "NSObject",
+      "NSInitializeWithInit": true
+    },
+    "keyEquivalent": "n",
+    "modifierMask": 1310720,
+    "defaultShortcut": "Ctrl+Cmd+n",
+    "priority": "low",
+    "hidden": false,
+    "allowedWhenHidden": false,
+    "runtimeAttributes": {
+      "arcTypeTravelID": "blankWindow",
+      "arcTypeTravelIcon": "macwindow.on.rectangle",
+      "arcTypeTravelTriggers": "Create Window",
+      "arcKeyBindingID": "newBlankWindow"
+    },
+    "handlers": [
+      {
+        "class": "AppDelegate",
+        "address": "0x10023660c"
+      }
+    ],
+    "appKitShortcut": "Ctrl+Cmd+n",
+    "handlerFamily": "AppDelegate",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": "newBlankWindow",
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  },
+  {
+    "nibId": 1495,
+    "title": "Open Little Arc or Peek in…",
+    "bindingId": "openTabIn",
+    "typeTravelId": null,
+    "selector": "openInCurrentSpace:",
+    "target": "FirstResponder",
+    "keyEquivalent": "o",
+    "modifierMask": 1048576,
+    "defaultShortcut": "Cmd+o",
+    "priority": "promptAfterConsumedByWebView",
+    "hidden": false,
+    "allowedWhenHidden": true,
+    "runtimeAttributes": {
+      "arcKeyBindingID": "openTabIn",
+      "arcKeyBindingPriority": "promptAfterConsumedByWebView"
+    },
+    "handlers": [
+      {
+        "class": "BrowserWindow",
+        "address": "0x10014fcfc"
+      },
+      {
+        "class": "LittleBrowserWindow",
+        "address": "0x1002c34ac"
+      },
+      {
+        "class": "MainWindowController",
+        "address": "0x100320888"
+      }
+    ],
+    "appKitShortcut": "Cmd+o",
+    "handlerFamily": "MainWindowController",
+    "supportClass": "local: native state validation required",
+    "validation": "static inventory only; runtime pending",
+    "tag": 0,
+    "nativeIdentifier": null,
+    "source": "Arc1.168.0 (88413) stock Base.lproj/MainMenu.nib"
+  }
+]

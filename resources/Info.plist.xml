@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ATSApplicationFontsPath</key>
+	<string>Fonts</string>
+	<key>BCNYBuildDate</key>
+	<string>7 Oct 2026, 19:08</string>
+	<key>BCNYCommitInfo</key>
+	<string>Release-88413-fa14ca30b43d8358878034fbea9767827b607d62</string>
+	<key>BCNYReleaseType</key>
+	<string>Release</string>
+	<key>BuildMachineOSBuild</key>
+	<string>25F71</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>HTML document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.html</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>XHTML document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.xhtml</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>Arc</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
+	<key>CFBundleIdentifier</key>
+	<string>company.thebrowser.Browser</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Arc</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.168.0</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Email Address URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>mailto</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>HTTPS URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>https</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>HTTP URL</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>http</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>Arc Browser</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>arcBrowser</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>88413</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformBuild</key>
+	<string>25E251</string>
+	<key>DTPlatformName</key>
+	<string>macosx</string>
+	<key>DTPlatformVersion</key>
+	<string>26.4</string>
+	<key>DTSDKBuild</key>
+	<string>25E251</string>
+	<key>DTSDKName</key>
+	<string>macosx26.4</string>
+	<key>DTXcode</key>
+	<string>2641</string>
+	<key>DTXcodeBuild</key>
+	<string>17E202</string>
+	<key>GPUEjectPolicy</key>
+	<string>wait</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>MallocNanoZone</key>
+		<string>0</string>
+	</dict>
+	<key>LSFileQuarantineEnabled</key>
+	<true/>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0.0</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSAppleScriptEnabled</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Websites may use your bluetooth for features on their site.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Websites may use your camera for features on their site.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Access to "Desktop" is required to make files accessible from Arc.</string>
+	<key>NSDockTilePlugIn</key>
+	<string>DockTilePlugIn.plugin</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Access to "Downloads" is required for downloading files from the web and to make files accessible from Arc.</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 The Browser Company. All rights reserved.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Websites may use your location for features on their site.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Websites may use your location for features on their site.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Websites may use your location for features on their site.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Websites may use your location for features on their site.</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Websites may use your microphone for features on their site.</string>
+	<key>NSPrincipalClass</key>
+	<string>Arc.BrowserApp</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+	<key>NSSupportsAutomaticTermination</key>
+	<false/>
+	<key>NSSupportsSuddenTermination</key>
+	<false/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>NSUserActivityTypeBrowsingWeb</string>
+	</array>
+	<key>OSAScriptingDefinition</key>
+	<string>Arc.sdef</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://releases.arc.net/updates.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>PuVxvsbwitqWEvMPriVhNzmiMiVp2AqD8psqG/qcS98=</string>
+	<key>SUScheduledCheckInterval</key>
+	<integer>28800</integer>
+</dict>
+</plist>

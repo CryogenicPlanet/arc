@@ -1,0 +1,17 @@
+{
+  "name": "arc-re",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsgo --noEmit",
+    "lint": "oxlint tools",
+    "test": "bun test tools/local-mode.test.ts && bun tools/test-service-policy.ts && bun tools/test-shortcut-policy.ts",
+    "symbols": "bun tools/build-symbol-map.ts",
+    "profile": "bun tools/profile-arc.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.3",
+    "@typescript/native-preview": "^7.0.0-dev.20260707.2",
+    "oxlint": "^1.87.0"
+  }
+}

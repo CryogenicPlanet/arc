@@ -1,0 +1,13 @@
+node_modules/
+ghidra/project/
+ghidra/logs/
+profiles/
+bin/
+build/
+dump/
+ghidra/decomp/
+ghidra/functions.tsv
+scratchpad/
+.DS_Store
+.env
+.env.*
