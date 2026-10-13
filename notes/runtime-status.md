@@ -31,17 +31,25 @@ including known failures. It is not a known-good shortcut baseline.
 - Cmd+[ and Cmd+] navigated between local fixture pages in the current mod. Back also
   worked immediately after a failed close in the earlier build. No history patch was
   needed for these checks.
+- The account requirement in the native saved-session restoration action is removed
+  at `0x102ab2f48`, after state destruction. Saved-data checks and global authentication
+  getters remain intact. This passes binary tests and fresh review; automatic startup
+  restoration is not established by the current runtime checks.
 
 ## Open regressions
 
-- The broader audit of account-dependent local actions is ongoing. Direct sidebar
-  close controls and the complete shortcut inventory still need further live coverage.
+- The bounded account-guard audit is complete; see `local-guard-audit.md` for exact
+  paths, preserved service checks and validation limits. Direct sidebar close controls
+  and the complete shortcut inventory still need further live coverage.
+- Automatic startup restoration still opened a fresh window during restart testing.
+  This remains a separate unresolved behavior after removing the confirmed account
+  gate; upstream encoding/dispatch did not expose another account rejection.
 - The static inventory contains 89 native NIB bindings. It is an inventory, not
   evidence that every shortcut has passed live testing.
 
 ## Validation boundaries
 
-Typecheck, lint, eleven Bun binary tests, native service-policy tests and native shortcut
+Typecheck, lint, twelve Bun binary tests, native service-policy tests and native shortcut
 policy tests pass. The native ABI probe checks both Foundation formatting and the local
 close fallback String representation. Build signing passed before launch. A fresh
 read-only review verified bridge branches, register preservation, ownership and padding.

@@ -75,6 +75,12 @@ localMenuValidation.writeUInt32LE(branch(0x100313cd0n, 0x100000000n + BigInt(sho
 const closeUserPresence = Buffer.from("e82640f9f40316aae00318aae10317aa00013fd6410700b4f40301aa61c20791795648a9e80315aa", "hex");
 const localCloseUserPresence = Buffer.from(closeUserPresence);
 localCloseUserPresence.writeUInt32LE(branch(0x102a3ade8n, 0x100000000n + BigInt(localCloseBridgeOffset)), 20);
+// Saved local windows are valid without an account. The copied WindowsState has
+// already been destroyed at this guard; retain all subsequent persisted-window
+// lookup and restoration checks and continue the existing native restore path.
+const savedWindowRestore = Buffer.from("f40300aab50640f9e00319aae1031baaa0023fd6b40f0036752600f97c3200f9", "hex");
+const localSavedWindowRestore = Buffer.from(savedWindowRestore);
+localSavedWindowRestore.set(Buffer.from("1f2003d5", "hex"), 20);
 const patches: readonly Patch[] = [
   { address: 0x10186b3b0n, original: onboarding, replacement: localOnboarding },
   { address: windowAddress, original: Buffer.from("000080d2678f8697f40300aa08805ff8081940f9e00316aa21008052e20314aa00013fd61f04007101070054", "hex"), replacement: localWindow },
@@ -88,6 +94,7 @@ const patches: readonly Patch[] = [
   { address: 0x100000000n + BigInt(shortcutBridgeOffset), original: Buffer.alloc(shortcutBridge.length), replacement: shortcutBridge },
   { address: 0x102a3add4n, original: closeUserPresence, replacement: localCloseUserPresence },
   { address: 0x100000000n + BigInt(localCloseBridgeOffset), original: Buffer.alloc(localCloseBridge.length), replacement: localCloseBridge },
+  { address: 0x102ab2f34n, original: savedWindowRestore, replacement: localSavedWindowRestore },
 ];
 
 export const patchLocalMode = (source: Buffer): Buffer => {
