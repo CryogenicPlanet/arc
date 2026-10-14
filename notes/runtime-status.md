@@ -10,6 +10,15 @@ including known failures. It is not a known-good shortcut baseline.
   and earlier runtime evidence are in `local-mode.md`.
 - Cmd+T opens the native command bar. Its nil-session path now cleans up the native
   state snapshot before continuing to the local action.
+- Cmd+L then Cmd+C now copies the selected URL. Arc's ordinary Edit → Copy item
+  uses `copyAction:`, which was missing from the finite local shortcut policy.
+  Admitting that wrapper preserves the existing validator continuation and native
+  `copy:` responder dispatch; no binary patch or new hook was added. Rebuilt,
+  signed normal ArcMod passed live full-URL and partial-selection clipboard checks,
+  Edit → Copy was enabled, and Shift+Cmd+C still copied the full URL. With an empty
+  selection the native command-bar path produced an empty clipboard; this change
+  does not add new empty-selection semantics. Native policy tests also retain
+  unavailable-service binding precedence for the new selector.
 - Cmd+, opens Settings. Shortcuts and Profiles load, and Settings can be closed and
   reopened. The crash report traced the previous failure to eager CloudKit account
   status access; the local patch supplies `couldNotDetermine` to the existing reducer.

@@ -19,6 +19,13 @@ int main(void) {
 			item.action = NSSelectorFromString(kArcModLocalSelectors[i]);
 			assert(ArcModCanValidateLocalMenuItem(item));
 		}
+		// Arc's ordinary Edit > Copy menu uses this wrapper selector, not copy:
+		// or the separate Copy URL action. It must reach native responder dispatch.
+		item.action = NSSelectorFromString(@"copyAction:");
+		assert(ArcModCanValidateLocalMenuItem(item));
+		item.testBinding = @"newNote";
+		assert(!ArcModCanValidateLocalMenuItem(item));
+		item.testBinding = nil;
 		item.action = NSSelectorFromString(@"performWithSender:");
 		assert(!ArcModCanValidateLocalMenuItem(item));
 		for (NSUInteger i = 0; i < sizeof(kArcModLocalBindingIDs) / sizeof(kArcModLocalBindingIDs[0]); i++) {

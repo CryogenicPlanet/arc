@@ -16,6 +16,7 @@
     "closeFocusedSplitViewPanel:",
     "closeWindow:",
     "collapseAllFolders:",
+    "copyAction:",
     "copyCurrentURL:",
     "copyCurrentURLAsMarkdown:",
     "copyCurrentURLAsQuote:",
