@@ -34,6 +34,12 @@ int main(void) {
 		}
 		item.testBinding = @"unregisteredCallback";
 		assert(!ArcModCanValidateLocalMenuItem(item));
+		// Generated BrowserWindow/LittleBrowserWindow menus retain their own
+		// validation; their IDs must not become broad MainWindow callbacks.
+		for (NSString *binding in @[@"item1", @"item9", @"item10", @"pane1", @"pane4", @"pane5", @"nextTab", @"previousTab", @"space1", @"space999"]) {
+			item.testBinding = binding;
+			assert(!ArcModCanValidateLocalMenuItem(item));
+		}
 		for (NSUInteger i = 0; i < sizeof(kArcModUnavailableBindingIDs) / sizeof(kArcModUnavailableBindingIDs[0]); i++) {
 			item.testBinding = kArcModUnavailableBindingIDs[i];
 			assert(!ArcModCanValidateLocalMenuItem(item));

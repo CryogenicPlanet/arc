@@ -5,6 +5,14 @@ including known failures. It is not a known-good shortcut baseline.
 
 ## Implemented and checked
 
+- Full shortcut audit covers 162 NIB actions, 19 generated native window bindings,
+  two generated alternates and dynamic Space selection. Eighteen omitted local
+  selectors now pass the finite nil-session bridge while retaining native state
+  checks. Normal ArcMod was rebuilt/signed; 72 live context/action checks cover
+  editing, rich text/spelling, tab/window navigation, splits, pinning, browser tools
+  and repaired local dialogs. Inventory drift and missing local/service routing
+  fail tests/builds. See [shortcut-audit.md](shortcut-audit.md) for every case,
+  generated command ownership, source fingerprints and live limits.
 - Local browsing without an account, vendor service filtering, separate ArcMod data,
   the bottom `ARC MOD` marker and reuse of one Little Arc are implemented. Details
   and earlier runtime evidence are in `local-mode.md`.
@@ -48,13 +56,15 @@ including known failures. It is not a known-good shortcut baseline.
 ## Open regressions
 
 - The bounded account-guard audit is complete; see `local-guard-audit.md` for exact
-  paths, preserved service checks and validation limits. Direct sidebar close controls
-  and the complete shortcut inventory still need further live coverage.
+  paths and preserved service checks. The complete shortcut inventory and priority
+  live matrix are recorded in `shortcut-audit.md`; destructive commands and every
+  possible profile/Space/modal combination remain outside live verification.
 - Automatic startup restoration still opened a fresh window during restart testing.
   This remains a separate unresolved behavior after removing the confirmed account
   gate; upstream encoding/dispatch did not expose another account rejection.
-- The static inventory contains 89 native NIB bindings. It is an inventory, not
-  evidence that every shortcut has passed live testing.
+- The initial Rename Space menu attempt after a rebuild was a transient no-op.
+  Subsequent command-bar/menu checks and a fresh-launch first-dialog retest passed.
+  No further account guard was found; the initial transient cause is unproven.
 
 ## Validation boundaries
 

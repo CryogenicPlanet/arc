@@ -15,6 +15,13 @@ the user has authorized testing in ArcMod directly. Do not alter the original Ar
 or its data. See `notes/runtime-status.md` for the current verified behavior and open
 shortcut regressions before making further patches.
 
+The full [shortcut audit](shortcut-audit.md) supersedes the old 89-binding-only
+inventory: 162 NIB actions, 21 generated entries and dynamic Space selection are
+classified. Eighteen additional exact local selectors were admitted; native state,
+responder ownership and service/security guards remain intact. Coverage verification
+runs in tests and before builds. The report records 72 live context/action checks
+and the remaining context/destructive-operation limits.
+
 ## Latest: local mode and single Little Arc
 
 Account onboarding is suppressed and local windows/external URLs work without an account

@@ -1,0 +1,25 @@
+{
+  "nativeResponder": [
+    "addFontTrait:", "capitalizeWord:", "checkSpelling:", "cut:", "delete:",
+    "lowercaseWord:", "orderFrontSubstitutionsPanel:", "paste:", "redo:",
+    "selectAll:", "showGuessPanel:", "startSpeaking:", "stopSpeaking:",
+    "toggleAutomaticDashSubstitution:", "toggleAutomaticDataDetection:",
+    "toggleAutomaticLinkDetection:", "toggleAutomaticQuoteSubstitution:",
+    "toggleAutomaticSpellingCorrection:", "toggleAutomaticTextReplacement:",
+    "toggleContinuousSpellChecking:", "toggleGrammarChecking:",
+    "toggleSmartInsertDelete:", "underline:", "undo:", "uppercaseWord:"
+  ],
+  "nativeSystem": [
+    "arrangeInFront:", "orderFrontStandardAboutPanel:", "performZoom:",
+    "setAsDefaultBrowser:", "unhideAllApplications:"
+  ],
+  "nativeAppearance": ["setAutomaticAppearance:", "setDarkAppearance:", "setLightAppearance:"],
+  "nativeDiagnostics": ["cancelTrace:", "recordTrace:"],
+  "serviceOrIntegration": [
+    "checkForUpdates:", "contactTheTeam:", "editBoost:", "exportArcNotes:",
+    "newBoost:", "newLegacyBoost:", "onSelectResource_releaseNotes:",
+    "openBoostGallery:", "sendCurrentTabToDia:", "signOut:", "viewBoosts:",
+    "viewEaselsAndNotes:", "visitHelpCenter:"
+  ],
+  "dynamicLocalSelectors": ["focusSpace:"]
+}

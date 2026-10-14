@@ -1,6 +1,10 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortcutPolicyHeader } from "./shortcut-policy";
+import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
+console.log(`Shortcut inventory: ${verifyShippedShortcutCoverage().length} shipped actions covered.`);
+const coverageTests = Bun.spawnSync(["bun", "test", ...["shortcut-inventory.test.ts", "shortcut-coverage.test.ts", "shortcut-generated-coverage.test.ts"].map((file) => join(import.meta.dir, file))], { stdout: "inherit", stderr: "inherit" });
+if (!coverageTests.success) throw new Error("shortcut inventory/coverage tests failed");
 const root = join(import.meta.dir, "..");
 const out = join(root, "build/shortcut-policy-test");
 mkdirSync(out, {recursive:true});
