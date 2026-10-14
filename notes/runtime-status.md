@@ -6,15 +6,22 @@ including known failures. It is not a known-good shortcut baseline.
 ## Agent sessions
 
 `--agent <slug>` creates separate app/data/preferences ownership and routes
-external links and the Little Arc menu action to full browser windows. The
-`codex` session is built, signed and running on loopback CDP port 9223; normal
-ArcMod retains its previous running bundle. Live background checks pass for
-trusted click/text input, screenshot capture, awaited JS, target isolation and
-closed-target rejection without changing the macOS foreground app. Focus
-emulation requires compositor-frame barriers before dispatch and before reset.
-See `agent-sessions.md` for setup, the native/shared-state diagnosis and limits.
-The Computer Use plugin still exposes native apps; a browser-provider/MCP
-adapter is not installed by this change.
+external links and the Little Arc menu action to full browser windows. The local
+`arcmod` stdio MCP adapter now exposes 15 browser/native tools, exclusive kernel
+session leases, fresh page/element handles, accessible page state, trusted
+background input, awaited navigation, explicit waits and inline screenshots.
+Native UI inspection stays bound to the exact agent PID; badge AX labels and a
+PID-bound native-readiness record are installed in new agent builds.
+
+Two independent MCP clients passed concurrent localhost workflows, navigation,
+async results, screenshot/native state, stale/foreign handle and competing CLI
+checks with zero agent foreground observations in 240 samples. A cold-start crash
+preceded the native-readiness barrier; two reruns passed after it. Source checks
+and the full suite pass with stable Bun 1.4.3. See [computer-use-tools.md](computer-use-tools.md)
+for setup, evidence and limits, and [agent-sessions.md](agent-sessions.md) for the
+native/shared-state diagnosis. The MCP adapter is registered in local Codex
+configuration; clients must load it. Computer Use itself still exposes native
+apps, with no custom browser-provider adapter installed.
 
 ## Implemented and checked
 

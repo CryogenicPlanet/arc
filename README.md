@@ -55,3 +55,12 @@ Automatic startup window restoration remains unresolved, and the complete shortc
 inventory has not passed exhaustive live testing. [HANDOFF.md](notes/HANDOFF.md)
 contains broader project context; [local mode](notes/local-mode.md) and the
 [account-guard audit](notes/local-guard-audit.md) explain the native changes.
+
+## Background browser tools
+
+The local [MCP browser tools](notes/computer-use-tools.md) provide isolated agent
+sessions, accessible page state, trusted input, awaited navigation, screenshots
+and exact-agent native UI inspection. Start `bun tools/agent-mcp.ts` through your
+MCP client; call `open_session` to allocate a background browser. Each agent gets
+its own profile and exclusive controller lease. The native Computer Use plugin
+continues to use its existing app interface.

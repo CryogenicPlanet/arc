@@ -10,11 +10,16 @@
 
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { homedir } from "node:os";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
 import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 import { parseBuildOptions } from "./agent-session";
+import { acquireLease } from "./agent-lease";
 
+// All bundles share generated headers/dylib, so serialize complete builds.
+const buildLease = acquireLease("global", join(homedir(), ".arcmod", "build-locks"));
+process.on("exit", () => buildLease.release());
 const root = join(import.meta.dir, "..");
 const { source: SOURCE, session } = parseBuildOptions(Bun.argv.slice(2));
 const { appName, bundleId: MOD_BUNDLE_ID } = session;

@@ -49,8 +49,10 @@ Use a different slug and CDP port for each concurrently active agent. Reuse the
 same slug across launches to retain its own browser data. No human profile is
 copied, so sessions start signed out. Do not drive multiple agents through one
 slug. The builder refuses to replace a running app bundle.
-Build/launch preflight checks are not an atomic session lease; serialize builds
-and launches for the same slug. Distinct agents should use distinct slugs.
+The MCP controller holds an exclusive kernel session lease across setup and
+control; the CLI shares that lock. Direct build/launch preflights alone are not
+a controller lease. Shared build output is now serialized. Distinct agents should
+use distinct slugs.
 
 The Info.plist session marker makes the dylib disable external-links Little Arc,
 skip human panel consolidation, redirect the Little Arc menu/shortcut action to
@@ -136,7 +138,9 @@ Final packaged session `codex` also passed the fresh-CLI input probe, including
 restored hidden-page visibility, on the signed build. It is running on loopback
 port 9223 with its own fresh data. The disposable `probe` app has been stopped.
 
-The Computer Use plugin does not currently auto-discover this endpoint as a
-browser provider. Native CUA binding and the local CDP bridge are separate
-interfaces. A plugin/MCP adapter is a follow-up integration, not implied by a
-working native app or port.
+The [stdio MCP browser tools](computer-use-tools.md) now wrap this endpoint
+with exclusive ownership, accessible state, scoped handles and awaited actions.
+The Computer Use plugin does not currently auto-discover it as a browser provider.
+Native CUA binding and the local CDP bridge are separate interfaces. The MCP adapter
+is separately implemented and live-verified; Computer Use provider integration
+remains a separate capability.

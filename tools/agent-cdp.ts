@@ -4,6 +4,7 @@
 import { writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { sessionIdentity } from "./agent-session";
+import { acquireLease, type Lease } from "./agent-lease";
 
 export type CDPParams = Record<string, unknown>;
 export type CDPResult = Record<string, unknown>;
@@ -91,7 +92,7 @@ const processOutput = (args: readonly string[]): string => {
   if (!result.success) throw new Error(`process inspection failed: ${args[0]} ${result.stderr.toString().trim()}`);
   return result.stdout.toString();
 };
-export const verifyAgentEndpoint = (agent: string, port: number): void => {
+export const verifyAgentEndpoint = (agent: string, port: number): number => {
   parsePort(String(port));
   const identity = sessionIdentity(false, agent);
   const executable = join(import.meta.dir, `../build/${identity.appName}.app/Contents/MacOS/Arc`);
@@ -99,7 +100,7 @@ export const verifyAgentEndpoint = (agent: string, port: number): void => {
   const pids = [...output.matchAll(/^p([1-9][0-9]*)$/gm)].map((match) => match[1]!);
   if (pids.length !== 1) throw new Error("CDP requires exactly one owning process");
   const command = processOutput(["/bin/ps", "-p", pids[0]!, "-o", "command="]);
-  verifyListener(output, command, executable, port);
+  return verifyListener(output, command, executable, port);
 };
 const object = (value: unknown): CDPResult => {
   if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error("malformed CDP response");
@@ -123,17 +124,30 @@ export const listAgentPages = async (agent: string, port: number): Promise<reado
   });
 };
 
-interface Pending { resolve: (result: CDPResult) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }
+export interface CDPEvent { readonly method: string; readonly params: CDPResult; readonly sessionId?: string }
+interface Pending { sessionId?: string; resolve: (result: CDPResult) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }
 export class AgentCDP {
   private nextId = 1;
   private readonly pending = new Map<number, Pending>();
   private readonly sessions = new Map<string, string>();
   private closed = false;
+  private readonly listeners = new Set<(event: CDPEvent) => void>();
+  onEvent(listener: (event: CDPEvent) => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   private constructor(private readonly socket: WebSocket, private readonly commandTimeoutMs: number) {
     socket.addEventListener("message", (event) => {
       try {
         const message = object(JSON.parse(String(event.data)));
-        if (typeof message.id !== "number") return;
+        if (typeof message.id !== "number") {
+          if (typeof message.method !== "string") return;
+          const params = object(message.params ?? {});
+          if (message.method === "Target.detachedFromTarget" && typeof params.sessionId === "string") {
+            for (const [target, session] of this.sessions) if (session === params.sessionId) this.sessions.delete(target);
+            for (const [id, work] of this.pending) if (work.sessionId === params.sessionId) { clearTimeout(work.timer); this.pending.delete(id); work.reject(new Error("target detached")); }
+          }
+          const event: CDPEvent = { method: message.method, params, ...(typeof message.sessionId === "string" ? { sessionId: message.sessionId } : {}) };
+          for (const listener of this.listeners) listener(event);
+          return;
+        }
         const pending = this.pending.get(message.id);
         if (!pending) return;
         const result = message.error === undefined ? object(message.result) : undefined;
@@ -174,7 +188,7 @@ export class AgentCDP {
     const id = this.nextId++;
     return new Promise((resolveResult, reject) => {
       const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`CDP command timed out: ${method}`)); }, this.commandTimeoutMs);
-      this.pending.set(id, { resolve: resolveResult, reject, timer });
+      this.pending.set(id, { resolve: resolveResult, reject, timer, ...(sessionId === undefined ? {} : { sessionId }) });
       try { this.socket.send(JSON.stringify({ id, method, params, ...(sessionId === undefined ? {} : { sessionId }) })); }
       catch (error) { clearTimeout(timer); this.pending.delete(id); reject(new Error(`CDP send failed: ${String(error)}`)); }
     });
@@ -193,10 +207,12 @@ export class AgentCDP {
     return this.request(method, params, session);
   }
   private failAll(error: Error): void {
+    if (!this.closed) for (const listener of this.listeners) listener({ method: "ArcMod.disconnected", params: {} });
     this.closed = true;
     for (const pending of this.pending.values()) { clearTimeout(pending.timer); pending.reject(error); }
     this.pending.clear();
     this.sessions.clear();
+    this.listeners.clear();
     if (this.socket.readyState !== WebSocket.CLOSED) this.socket.close();
   }
   close(): void { this.failAll(new Error("CDP connection closed")); }
@@ -209,7 +225,7 @@ const frameBarrier = async (client: AgentCDP, id: string, expression: string): P
   if (result.exceptionDetails !== undefined) throw new Error(`input frame synchronization failed: ${JSON.stringify(result.exceptionDetails)}`);
 };
 
-const withTargetFocus = async <T>(client: AgentCDP, id: string, action: () => Promise<T>): Promise<T> => {
+export const withTargetFocus = async <T>(client: AgentCDP, id: string, action: () => Promise<T>): Promise<T> => {
   let result: T | undefined;
   let failed = false;
   let failure: unknown;
@@ -222,7 +238,12 @@ const withTargetFocus = async <T>(client: AgentCDP, id: string, action: () => Pr
     await frameBarrier(client, id, "new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))");
     result = await action();
     // Drain queued input and its rendering before restoring hidden-page focus.
-    await frameBarrier(client, id, "new Promise(resolve => requestAnimationFrame(resolve))");
+    try { await frameBarrier(client, id, "new Promise(resolve => requestAnimationFrame(resolve))"); }
+    catch (error) {
+      // Dispatch has completed. A navigation can destroy the drain context;
+      // never replay input. Higher-level tools observe the new document.
+      if (!/Execution context was destroyed|Cannot find context with specified id/.test(String(error))) throw error;
+    }
   } catch (error) {
     failed = true;
     failure = error;
@@ -284,12 +305,14 @@ export const executeCommand = async (client: AgentCDP, command: Command): Promis
 
 if (import.meta.main) {
   let client: AgentCDP | undefined;
+  let lease: Lease | undefined;
   try {
     const options = parseCDPOptions(Bun.argv.slice(2));
+    lease = acquireLease(options.agent);
     let result: unknown;
     if (options.command.name === "list") result = await listAgentPages(options.agent, options.port);
     else { client = await AgentCDP.connectAgent(options.agent, options.port); result = await executeCommand(client, options.command); }
     console.log(JSON.stringify(result));
   } catch (error) { console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1; }
-  finally { client?.close(); }
+  finally { client?.close(); lease?.release(); }
 }

@@ -161,6 +161,9 @@ static void ArcModInstallWindowBadge(NSWindow *window) {
 		}
 		ArcModBadgeView *badge = [ArcModBadgeView new];
 		badge.identifier = @"ArcModBadge";
+		badge.accessibilityIdentifier = @"ArcModBadge";
+		badge.accessibilityElement = YES;
+		badge.accessibilityRole = NSAccessibilityGroupRole;
 		badge.translatesAutoresizingMaskIntoConstraints = NO;
 		badge.wantsLayer = YES;
 		badge.layer.cornerRadius = 5;
@@ -169,12 +172,14 @@ static void ArcModInstallWindowBadge(NSWindow *window) {
 		badge.layer.borderWidth = 1;
 		NSString *session = ArcModAgentSession();
 		NSString *badgeText = session.length ? [NSString stringWithFormat:@"ARC MOD · %@", session] : @"ARC MOD";
+		badge.accessibilityLabel = badgeText;
 		NSTextField *label = [NSTextField labelWithString:badgeText];
 		label.font = [NSFont monospacedSystemFontOfSize:11 weight:NSFontWeightBold];
 		label.textColor = [NSColor colorWithSRGBRed:0.65 green:0.9 blue:1 alpha:1];
 		label.alignment = NSTextAlignmentCenter;
 		label.lineBreakMode = NSLineBreakByTruncatingTail;
 		label.toolTip = badgeText;
+		label.accessibilityIdentifier = @"ArcModSessionLabel";
 		label.translatesAutoresizingMaskIntoConstraints = NO;
 		[badge addSubview:label];
 		[sidebar addSubview:badge positioned:NSWindowAbove relativeTo:nil];
@@ -187,6 +192,16 @@ static void ArcModInstallWindowBadge(NSWindow *window) {
 			[label.centerXAnchor constraintEqualToAnchor:badge.centerXAnchor], [label.centerYAnchor constraintEqualToAnchor:badge.centerYAnchor],
 		]];
 		ArcModLog(@"ARC MOD sidebar badge installed");
+		if (session.length) {
+			// A Chromium listener alone can precede Arc's native window setup.
+			// Publish a PID-bound readiness record only after the sidebar exists.
+			NSURL *support = [NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask].firstObject;
+			NSURL *directory = [support URLByAppendingPathComponent:[NSBundle.mainBundle objectForInfoDictionaryKey:@"CFBundleName"] isDirectory:YES];
+			NSURL *ready = [directory URLByAppendingPathComponent:@"ArcModAgentReady.json"];
+			NSData *data = [NSJSONSerialization dataWithJSONObject:@{@"pid": @(getpid()), @"agent": session, @"ready": @YES} options:0 error:NULL];
+			if ([data writeToURL:ready options:NSDataWritingAtomic error:NULL])
+				[NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:ready.path error:NULL];
+		}
 }
 
 static void ArcModInstallWindowBadges(void) {
