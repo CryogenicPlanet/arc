@@ -104,7 +104,7 @@ readiness barrier preceded two successful reruns. This is evidence for the teste
 local workflows, not arbitrary website, dialog or large-scale concurrency support.
 
 Typecheck and lint pass. The complete current suite passed with stable Bun 1.4.3:
-48 core tests plus 16 concurrent-workspace shortcut tests, service/shortcut native
+48 core tests plus the concurrent-workspace shortcut tests, service/shortcut native
 policy checks and binary source present. The installed old Bun 1.4.0 canary's test
 runner intermittently failed subprocess pipes with EBADF even in a minimal test
 without ArcMod imports. Stable Bun was downloaded only to ignored scratchpad for
