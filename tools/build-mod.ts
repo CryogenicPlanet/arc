@@ -12,6 +12,7 @@ import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } f
 import { join, relative } from "node:path";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
+import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 import { parseBuildOptions } from "./agent-session";
 
 const root = join(import.meta.dir, "..");
@@ -61,6 +62,7 @@ const version = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CF
 const build = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBundleVersion"]).trim();
 if (version !== "1.168.0" || build !== "88413") throw new Error(`unsupported Arc ${version} (${build}); local-mode patch targets 1.168.0 (88413)`);
 step(`source ${SOURCE} (Arc ${version})`);
+step(`verify complete menu coverage (${verifyShippedShortcutCoverage(SOURCE).length} actions)`);
 step("verify native Foundation formatting ABI for compact state serialization");
 console.log(`  ${sh(["xcrun", "swift", "-O", join(root, "tools/verify-foundation-abi.swift")]).trim()}`);
 mkdirSync(join(root, "build"), { recursive: true });

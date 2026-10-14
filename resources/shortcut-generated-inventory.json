@@ -1,0 +1,183 @@
+{
+  "arcVersion": "1.168.0",
+  "arcBuild": "88413",
+  "builders": [
+    {
+      "address": "0x10003aa54",
+      "length": 3312,
+      "sha256": "ec8a19ce94700b62555aa26db1f6201e039404a75ef1290e1f2bb6abc14b9c2c"
+    },
+    {
+      "address": "0x10003a2d0",
+      "length": 1852,
+      "sha256": "7e051f54e5842f0b01c13c7d2c5d830a3e54f36037ca6611278f6daaa2c7c981"
+    },
+    {
+      "address": "0x1000839d8",
+      "length": 4004,
+      "sha256": "45499cd8c94f38fa709cdd07b5e59b59014addd40094b8981d838739c88934b8"
+    },
+    {
+      "address": "0x10014ff18",
+      "length": 1212,
+      "sha256": "5ee5352c8d60a28def4b7b9c71fbf1e87c8f006b071ef57f7e5e1a9127684501"
+    },
+    {
+      "address": "0x1002c3a60",
+      "length": 924,
+      "sha256": "023b38dd27313889934f0f8f39ca9dce96a4efbd6ac20d7a9e02be1323e67cb7"
+    }
+  ],
+  "families": [
+    {
+      "ids": [
+        "item1",
+        "item2",
+        "item3",
+        "item4",
+        "item5",
+        "item6",
+        "item7",
+        "item8",
+        "item9"
+      ],
+      "selector": "switchToTab:",
+      "tags": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "chords": [
+        "Cmd+1",
+        "Cmd+2",
+        "Cmd+3",
+        "Cmd+4",
+        "Cmd+5",
+        "Cmd+6",
+        "Cmd+7",
+        "Cmd+8",
+        "Cmd+9"
+      ],
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014f7ec",
+      "builder": "0x10003aa54",
+      "validation": "nativeWindow",
+      "note": "Tag 9 selects the last item."
+    },
+    {
+      "ids": [
+        "pane1",
+        "pane2",
+        "pane3",
+        "pane4"
+      ],
+      "selector": "switchToWindowContent:",
+      "tags": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "chords": [
+        "Ctrl+Shift+1",
+        "Ctrl+Shift+2",
+        "Ctrl+Shift+3",
+        "Ctrl+Shift+4"
+      ],
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014f9a4",
+      "builder": "0x10003a2d0",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "switchToNextWindowPane",
+      "selector": "switchToNextWindowContent:",
+      "chord": "Ctrl+Shift+]",
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014fa44",
+      "builder": "0x10003a2d0",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "switchToPreviousWindowPane",
+      "selector": "switchToPreviousWindowContent:",
+      "chord": "Ctrl+Shift+[",
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014fb94",
+      "builder": "0x10003a2d0",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "nextTab",
+      "selector": "nextTab:",
+      "chord": "Cmd+}",
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014fba4",
+      "builder": "0x10003aa54",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "previousTab",
+      "selector": "previousTab:",
+      "chord": "Cmd+{",
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014fb9c",
+      "builder": "0x10003aa54",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "openExtensionsPicker",
+      "selector": "toggleOpenExtensions:",
+      "chord": "Cmd+E",
+      "owner": "Arc.BrowserWindow",
+      "handler": "0x10014fc84",
+      "builder": "0x10003aa54",
+      "validation": "nativeWindow"
+    },
+    {
+      "id": "showLittleArcOpenInMenu",
+      "selector": "toggleMoveMenu:",
+      "chord": "Shift+Cmd+O",
+      "owner": "Arc.LittleBrowserWindow",
+      "handler": "0x1002c3510",
+      "builder": "0x10003aa54",
+      "validation": "nativeWindow"
+    },
+    {
+      "idPattern": "space<N>",
+      "selector": "focusSpace:",
+      "chordPattern": "Ctrl+N for indexed entries N<10; native overrides supersede",
+      "owner": "Arc.MainWindowController",
+      "handler": "0x10031d294",
+      "builder": "0x1000839d8",
+      "validation": "localFinitePolicy",
+      "note": "Native representedObject contains SpaceID; no broad binding prefix admission."
+    },
+    {
+      "id": null,
+      "selector": "pasteAsPlainText:",
+      "chord": "Option+Shift+Cmd+V",
+      "modifierMask": 1703936,
+      "owner": "native responder chain",
+      "builder": "0x10003aa54",
+      "validation": "localFinitePolicy",
+      "note": "Unregistered native alternate; same selector as NIB action."
+    },
+    {
+      "id": null,
+      "selector": "toggleFullScreen:",
+      "chord": null,
+      "modifierMask": 8388608,
+      "owner": "native responder chain",
+      "builder": "0x10003aa54",
+      "validation": "localFinitePolicy",
+      "note": "Unregistered native function-modifier alternate; exact physical key behavior not live tested."
+    }
+  ]
+}
