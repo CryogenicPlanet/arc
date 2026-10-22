@@ -1,12 +1,9 @@
 node_modules/
-ghidra/project/
 ghidra/logs/
+ghidra/project/
 profiles/
 bin/
 build/
-dump/
-ghidra/decomp/
-ghidra/functions.tsv
 scratchpad/
 .DS_Store
 .env

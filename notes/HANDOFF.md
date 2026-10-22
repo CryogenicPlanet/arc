@@ -7,8 +7,8 @@ Last updated 2026-10-13. Working dir: `/Users/cryogenicplanet/general/arc`.
 Git was initialized on `main` on 2026-10-13 at the user's request. The first commit is
 a snapshot of the existing implementation, not a reconstruction of earlier edits.
 Keep subsequent fixes in separate commits so regressions can be compared and reverted.
-Generated decompiles, vendor binaries, app builds, browser profiles and recordings are
-excluded from Git.
+Vendor binaries, app builds, browser profiles and recordings are excluded from Git.
+The Arc 1.168.0 decompile and dumps are tracked with Git LFS; the Ghidra project is local.
 
 Use **ArcMod** for testing going forward. ArcModValidation was an isolated test copy;
 the user has authorized testing in ArcMod directly. Do not alter the original Arc app
@@ -95,7 +95,7 @@ Little Snitch (`*.arc.net`, `*.diabrowser.engineering`, `firestore.googleapis.co
 - `dump/symbol-map.tsv` — 15,806 addr→name entries (nm + objc + swift), demangled. Rebuild: `bun tools/build-symbol-map.ts`.
 - `dump/strings.txt`, `dump/stubs.txt` (otool -Iv stubs), `dump/launchdarkly-flags.xml` (852 cached flags).
 - `dump/arc.a2s` — ipsw address-to-symbol cache (speeds up `ipsw macho disass --cache dump/arc.a2s`).
-- **Ghidra project** `ghidra/project/Arc` (persistent; gitignored). Analysis done, all 15,806 names applied.
+- **Ghidra project** `ghidra/project/Arc` (persistent; local only, gitignored). Analysis done, all 15,806 names applied.
   - `ghidra/functions.tsv` — 280,576 function bounds (entry/end/size/name). Used by the profiler.
   - `ghidra/decomp/0x….c` — **full decompile, 245,970 functions in 57 shards** by 1MB address range.
     Find a function: shard = `0x` + top bits of its address, e.g. addr 0x100d8868c → `ghidra/decomp/0x100d.c`.

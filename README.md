@@ -59,15 +59,23 @@ bun run lint
 bun run test
 ```
 
-Binary tests skip when `bin/Arc.arm64` is missing. Generated binaries, app builds,
-decompiles and profiles are ignored by Git.
+Binary tests skip when `bin/Arc.arm64` is missing. Generated binaries, app builds and
+profiles are ignored by Git.
+
+## Reverse-engineering artifacts
+
+The Arc 1.168.0 decompile (`ghidra/decomp/`, `ghidra/functions.tsv`) and symbol and
+class dumps (`dump/`) are stored with Git LFS, about 350 MB in total.
+Install Git LFS before cloning. The analyzed Ghidra project (`ghidra/project/`) stays
+local and is ignored by Git.
 
 ## Repo layout
 
 - `mods/`: injected native module and local service/shortcut policies.
 - `tools/`: build, patch, launch, test and profiling scripts.
 - `resources/`: native app metadata and policy definitions.
-- `ghidra/scripts/`: reverse-engineering helpers.
+- `ghidra/`, `dump/`: Arc 1.168.0 decompile, symbol dumps and helpers; the Ghidra
+  project stays local.
 - `notes/`: findings, runtime evidence and handoffs.
 
 For current behavior and known issues, read [runtime status](notes/runtime-status.md).
