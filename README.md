@@ -34,9 +34,28 @@ You're on `no-login`. The rest of this README covers only what this branch inclu
 
 - Arc account features: sync across devices, Arc Max AI features, and calendar and
   email previews.
-- iCloud, passkeys and push notifications. The copy is re-signed on your Mac, and
-  Apple ties those features to Arc's original signature.
+- iCloud, push notifications, and passkeys stored in iCloud Keychain or with Touch ID
+  (see [Passkeys](#passkeys)). The copy is re-signed on your Mac, and Apple ties those
+  features to Arc's original signature.
 - Automatic updates. ArcMod never updates itself.
+
+## Passkeys
+
+| Passkey | In ArcMod |
+| --- | --- |
+| Saved in iCloud Keychain or on this Mac with Touch ID | **Doesn't work** |
+| On your phone ("Use a phone or tablet", scan the QR code) | Should work; not tested yet |
+| Hardware security key (YubiKey and similar) | Should work; not tested yet |
+| Password-manager extension that handles passkeys (1Password, Bitwarden) | Should work; not tested yet |
+
+macOS only lets a browser use iCloud Keychain and Touch ID passkeys when Apple has
+granted its developer a passkey entitlement, and the app carries that developer's
+signature. Arc had one; ArcMod is re-signed on your Mac, so it can't. The other three
+don't need the entitlement. The phone option uses Bluetooth, and macOS may ask for
+permission again after each rebuild.
+
+Native passkeys will need a signed ArcMod release from a developer with Apple's
+passkey entitlement. That's planned. Builds from source stay without native passkeys.
 
 ## Requirements
 
