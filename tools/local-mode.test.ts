@@ -12,13 +12,13 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
   const originalDigest = Bun.hash(original);
   const patched = patchLocalMode(original);
 
-  test("changes only local gates, Little Arc selection and verified performance sites, keeping the source intact", () => {
+  test("changes only verified local gates, keeping the source intact", () => {
     expect(patched.length).toBe(original.length);
     expect(Bun.hash(original)).toBe(originalDigest);
     const changed: number[] = [];
     original.forEach((byte, i) => { if (byte !== patched[i]) changed.push(i); });
-    expect(changed.length).toBe(226);
-    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4))).toBe(true);
+    expect(changed.length).toBe(203);
+    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x1f5f79c && i < 0x1f5f7a4))).toBe(true);
     // The new call must destroy the optional session, and the branch must reach local bootstrap.
     const target = (offset: number): number => {
       const immediate = patched.readUInt32LE(offset) & 0x3ffffff;
@@ -27,8 +27,6 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     };
     expect(target(0x2a75758)).toBe(0x733c);
     expect(target(0x2a7575c)).toBe(0x2a75868);
-    expect(target(0x2a7cb6c)).toBe(0x8314);
-    expect(target(0x2a7cb74)).toBe(0x2a7cbe0);
     expect(target(0x1af800)).toBe(0x1af868);
     expect(target(0x31cb04)).toBe(0x31cb50);
     expect(target(0x1f5f7a0)).toBe(0x1f5f89c);
@@ -41,7 +39,10 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(target(shortcutBridgeOffset + 68)).toBe(0x313d0c);
     expect(target(shortcutBridgeOffset + 76)).toBe(0x313e74);
     expect(patched.subarray(0x31caf4, 0x31cb04)).toEqual(original.subarray(0x31caf4, 0x31cb04));
-    expect(patched.subarray(0x2a7cb58, 0x2a7cb60)).toEqual(original.subarray(0x2a7cb58, 0x2a7cb60));
+    // Little Arc selection, Storable formatting and LaunchDarkly startup stay native.
+    expect(patched.subarray(0x2a7cb50, 0x2a7cb78)).toEqual(original.subarray(0x2a7cb50, 0x2a7cb78));
+    expect(patched.subarray(0xdab520, 0xdab534)).toEqual(original.subarray(0xdab520, 0xdab534));
+    expect(patched.subarray(0x143425c, 0x143427c)).toEqual(original.subarray(0x143425c, 0x143427c));
   });
 
   test("local close fallback keeps native cleanup and every global account getter intact", () => {
@@ -77,15 +78,6 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(patched.subarray(0x1f5f89c, 0x1f5f8ec)).toEqual(original.subarray(0x1f5f89c, 0x1f5f8ec));
   });
 
-  test("preserves the Foundation indirect-result ABI and LDConfig's other defaults", () => {
-    expect(patched.readUInt32LE(0xdab528)).toBe(0xf900011f); // str xzr,[x8], eight-byte OptionSet
-    expect(patched.subarray(0xdab520, 0xdab528)).toEqual(original.subarray(0xdab520, 0xdab528));
-    expect(patched.subarray(0xdab52c, 0xdab534)).toEqual(original.subarray(0xdab52c, 0xdab534));
-    expect(patched.readUInt32LE(0x143426c)).toBe(0x38286abf); // only startOnline's store becomes false
-    expect(patched.subarray(0x143425c, 0x143426c)).toEqual(original.subarray(0x143425c, 0x143426c));
-    expect(patched.subarray(0x1434270, 0x143427c)).toEqual(original.subarray(0x1434270, 0x143427c));
-  });
-
   test("is idempotent", () => expect(patchLocalMode(patched)).toEqual(patched));
 
   test("rejects another version without mutating its bytes", () => {
@@ -96,8 +88,8 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(Bun.hash(mismatch)).toBe(digest);
   });
 
-  test("rejects drift in either performance fingerprint", () => {
-    for (const offset of [0xdab524, 0x1434264, 0x313cd0, 0x2a3ade8, 0x2ab2f48]) {
+  test("rejects drift in bridged local fingerprints", () => {
+    for (const offset of [0x313cd0, 0x2a3ade8, 0x2ab2f48]) {
       const mismatch = Buffer.from(original);
       mismatch[offset] = 0;
       const digest = Bun.hash(mismatch);

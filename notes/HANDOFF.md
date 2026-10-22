@@ -22,18 +22,19 @@ responder ownership and service/security guards remain intact. Coverage verifica
 runs in tests and before builds. The report records 72 live context/action checks
 and the remaining context/destructive-operation limits.
 
-## Latest: local mode and single Little Arc
+## Latest: local mode
 
-Account onboarding is suppressed and local windows/external URLs work without an account
-session. Known native vendor/backend/telemetry requests are blocked; service preferences
-are disabled. The bottom sidebar shows `ARC MOD`. New Little Arc requests reuse one
-window and replace its content, including different-host external links. The dylib is now
-a required load. See `notes/local-mode.md` for exact patch sites, isolation details,
-runtime evidence and remaining limits. `bun run test` is now available. A separate
+This is the `no-login` branch. Account onboarding is suppressed and local windows/external
+URLs work without an account session. Known native vendor/backend/telemetry requests are
+blocked; service preferences are disabled. The dylib is a required load. Single Little Arc,
+the performance patches, agent sessions and the sidebar marker are on `master` only.
+See `notes/local-mode.md` for exact patch sites, isolation details, runtime evidence and
+remaining limits. `bun run test` is now available. A separate
 validation build is supported with `--validation` on build and launch commands.
 
 The earlier no-account investigation below is historical context. This section records
-the current local-mode implementation; the performance findings below remain independent.
+the current local-mode implementation. The performance and agent-control findings below
+are research context; this branch does not ship those changes.
 
 ## Goal
 
@@ -55,8 +56,8 @@ tools/run-mod.sh --guard       # launch under sandbox-exec that denies all acces
                                #   (verification only: --guard also disables Chromium's sandbox)
 ```
 
-Proven: our `ArcMod.dylib` loads into Arc's process, runs an ObjC-runtime hook of
-`-[Arc.BrowserApp sendAction:to:from:]`, badges the Dock "MOD", and adds an "ArcMod" menu.
+Proven: our `ArcMod.dylib` loads into Arc's process and hooks Arc's native menu validation
+through the ObjC runtime.
 The mod runs with its own data in `~/Library/Application Support/ArcMod` and the real Arc's
 `~/Library/Application Support/Arc` (332 sidebar items) stays intact.
 
@@ -134,7 +135,7 @@ wins, patch recipe, live flag values) and `notes/agent-control-surface.md`. Key 
   inside the document). Writer `Storable.StorableDataStoreImpl` (swift-types:25731) runs on its own
   background-QoS queue, encode ≈9 ms, **not on the main thread** (measured 2026-10-12, see
   `notes/perf-wins.md`). `StorableArchiveItems.json` 1.1MB / 2,398 items decoded at launch.
-  One 4-byte patch at `0x100dab528` makes every store compact JSON.
+  One 4-byte patch at `0x100dab528` makes every store compact JSON (shipped on `master` only).
 - **Oversized TCA state:** `Arc.WindowState` has 104 fields (swift-types:3536) and is copied per window;
   sidebar hover mutates root state. `PersistedWindowState` 85, `PreferencesFeature.State` 79, etc.
 - **Cheap/safe levers:** macOS Reduce Motion (Arc respects it), turn off hover cards / tidy tabs / tab
@@ -153,7 +154,7 @@ wins, patch recipe, live flag values) and `notes/agent-control-surface.md`. Key 
 - `tools/build-mod.ts` — clone + patch + inside-out ad hoc re-sign. `tools/insert-dylib.ts` — safe
   required LC_LOAD_DYLIB inserter. `tools/run-mod.sh` — launcher (+`--guard`). `tools/build-symbol-map.ts`,
   `tools/profile-arc.ts`, `tools/ghidra-post.sh`. `ghidra/scripts/*.java`.
-- `mods/hello/ArcMod.m` — the proof-of-concept dylib (logging, Dock badge, menu, sendAction hook).
+- `mods/hello/ArcMod.m` — the local-mode dylib (logging, service policy, menu validation, local window).
 - Repo uses bun + tsgo + oxlint: `bun run typecheck`, `bun run lint` both pass. tsconfig is strict
   with noUncheckedIndexedAccess + exactOptionalPropertyTypes. Per global prefs: functional style,
   typesafe. (Effect/ts-results not used yet — these are small scripts; adopt for the MCP server.)

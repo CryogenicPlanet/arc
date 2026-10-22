@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Builds build/ArcMod.app: a local-mode APFS clone of /Applications/Arc.app.
 //   - own bundle id (company.thebrowser.Browser.mod) and Sparkle auto-update disabled
-//   - arm64 executable, required ArcMod.dylib, fingerprinted local UI/URL/single-Little-Arc patches
+//   - arm64 executable, required ArcMod.dylib, fingerprinted local UI/URL patches
 //   - every nested binary re-signed ad hoc, inside-out, WITHOUT hardened runtime (so no library
 //     validation) and without Arc's restricted entitlements (iCloud, keychain groups, push)
 // /Applications/Arc.app is never modified.
@@ -55,7 +55,7 @@ const build = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBu
 if (version !== "1.168.0" || build !== "88413") throw new Error(`unsupported Arc ${version} (${build}); local-mode patch targets 1.168.0 (88413)`);
 step(`source ${SOURCE} (Arc ${version})`);
 step(`verify complete menu coverage (${verifyShippedShortcutCoverage(SOURCE).length} actions)`);
-step("verify native Foundation formatting ABI for compact state serialization");
+step("verify native CloudKit status and local close String ABI");
 console.log(`  ${sh(["xcrun", "swift", "-O", join(root, "tools/verify-foundation-abi.swift")]).trim()}`);
 mkdirSync(join(root, "build"), { recursive: true });
 writeFileSync(join(root, "build/ArcModServiceHosts.h"), servicePolicyHeader);

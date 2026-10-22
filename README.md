@@ -1,11 +1,15 @@
 # ArcMod
 
-A local Arc mod for account-free browsing, single-window Little Arc, and targeted
-performance improvements. This repo builds a separate `ArcMod.app` using an injected
-Objective-C module and version-checked patches to Arc's native app layer.
+A local Arc mod for account-free browsing. This repo builds a separate `ArcMod.app`
+using an injected Objective-C module and version-checked patches to Arc's native app
+layer. Arc runs without signing in, and its vendor services are filtered locally.
+
+This is the `no-login` branch: it carries only the account-free changes. Single
+Little Arc, the performance patches, agent sessions/browser tools and the sidebar
+marker are on `master`.
 
 The original Arc app and its data stay untouched. ArcMod uses
-`~/Library/Application Support/ArcMod` and shows an `ARC MOD` marker in the sidebar.
+`~/Library/Application Support/ArcMod`.
 
 ## Requirements
 

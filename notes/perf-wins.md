@@ -49,10 +49,9 @@ Pretty-print overhead of the stores that are decoded at launch or rewritten at r
 File offset in the arm64 slice = `0xdab528` (`__TEXT` fileoff 0). Bytes there are `44 dc 9f 94`.
 Replace with `1f 01 00 f9` (`str xzr, [x8]`). Foundation returns this resilient value
 through the indirect result address in `x8`; the earlier `mov x0, #0` recipe was incorrect.
-The native ABI probe in `tools/verify-foundation-abi.swift` checks its representation.
-`JSONDecoder` reads either form and backups remain readable. This patch is now applied
-by `tools/patch-local-mode.ts` before signing. The measured storage surrogate result
-and limits are recorded in `runtime-status.md`.
+`JSONDecoder` reads either form and backups remain readable. The patch, its native ABI
+probe and the measured storage result are on `master`; the `no-login` branch does not
+ship it.
 
 ### 2. Stop the idle rewrite + Firestore publish loop
 

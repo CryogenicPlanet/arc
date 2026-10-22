@@ -7,7 +7,8 @@
   older survey notes.
 - Target Arc **1.168.0 (88413), arm64**. Keep changes in the native app layer;
   Chromium engine code is currently unchanged.
-- Preserve local account-free behavior, service filtering and single Little Arc.
+- Preserve local account-free behavior and service filtering. This `no-login`
+  branch carries only those changes; other features belong on `master`.
   Follow Arc's native design for UI changes.
 
 ## Workflow

@@ -13,9 +13,10 @@ including known failures. It is not a known-good shortcut baseline.
   and repaired local dialogs. Inventory drift and missing local/service routing
   fail tests/builds. See [shortcut-audit.md](shortcut-audit.md) for every case,
   generated command ownership, source fingerprints and live limits.
-- Local browsing without an account, vendor service filtering, separate ArcMod data,
-  the bottom `ARC MOD` marker and reuse of one Little Arc are implemented. Details
-  and earlier runtime evidence are in `local-mode.md`.
+- Local browsing without an account, vendor service filtering and separate ArcMod
+  data are implemented. Details and earlier runtime evidence are in `local-mode.md`.
+  This `no-login` branch omits single Little Arc, compact Storable JSON, offline
+  LaunchDarkly startup, telemetry defaults and the sidebar marker; they are on `master`.
 - Cmd+T opens the native command bar. Its nil-session path now cleans up the native
   state snapshot before continuing to the local action.
 - Cmd+L then Cmd+C now copies the selected URL. Arc's ordinary Edit → Copy item
@@ -30,13 +31,6 @@ including known failures. It is not a known-good shortcut baseline.
 - Cmd+, opens Settings. Shortcuts and Profiles load, and Settings can be closed and
   reopened. The crash report traced the previous failure to eager CloudKit account
   status access; the local patch supplies `couldNotDetermine` to the existing reducer.
-- Storable JSON encoding is compact. The indirect Foundation result is initialized
-  through `x8`, verified by a native ABI probe. A read-only Codable surrogate measured
-  36.7% fewer bytes across five captured stores; this does not establish an overall
-  browser speedup. Existing data is rewritten through ordinary native saves.
-- LaunchDarkly starts offline. No LaunchDarkly requests appeared after startup in
-  the measured mod runs. Other blocked SDKs can still retry locally.
-- Six verified telemetry defaults are disabled while preserving unrelated overrides.
 - The finite local shortcut classifier and native menu-validation bridge are
   implemented and covered by native and binary tests.
 - Cmd+W removes loaded disposable unpinned tabs, and Cmd+Shift+T restores the closed
@@ -68,11 +62,18 @@ including known failures. It is not a known-good shortcut baseline.
 
 ## Validation boundaries
 
-Typecheck, lint, twelve Bun binary tests, native service-policy tests and native shortcut
-policy tests pass. The native ABI probe checks both Foundation formatting and the local
+Typecheck, lint, eleven Bun local-mode tests (ten binary), native service-policy tests and
+native shortcut policy tests pass. The native ABI probe checks the CloudKit status value and the local
 close fallback String representation. Build signing passed before launch. A fresh
 read-only review verified bridge branches, register preservation, ownership and padding.
 Do not describe those checks as proof that every shortcut works.
+
+On this `no-login` branch, the live results above came from full builds that also carried
+the dropped features. This branch's own validation build was rebuilt, signed and launched
+on 2026-10-22 (see `local-mode.md`): it opened a local window and an external localhost
+URL without an account. The shortcut matrix and Settings were not re-run on it.
+`/Applications/Arc.app` has since updated to 1.169.0, so builds and the shortcut coverage
+test need a 1.168.0 source bundle.
 
 The back-forward-cache experiment did not produce persisted page restoration; no
 bfcache change is retained. Command-bar captures used different workloads and cannot

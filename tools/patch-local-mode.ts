@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
 // Arc 1.168.0 (88413), arm64: suppress the account onboarding window without
 // manufacturing an AuthSession or changing any authentication result.
-// Also enables local window/URL routing and restores single Little Arc reuse.
-// Performance: compact Storable JSON and initialize LaunchDarkly offline.
+// Also enables local window/URL routing.
 import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortcutBridge, shortcutBridgeOffset } from "./shortcut-bridge";
@@ -31,27 +30,11 @@ const windowInstructions = [
 ];
 const localWindow = Buffer.alloc(windowInstructions.length * 4);
 windowInstructions.forEach((instruction, i) => localWindow.writeUInt32LE(instruction, i * 4));
-// Keep the WindowStyle.little check; accept any Little Arc instead of requiring
-// the same hostname/entry point. Arc's existing session and navigation path does the reuse.
-const littleArc = Buffer.from("e1031aaa10c72c941f0400718103005442bfff9042102191e00318aae1031baad82d5697941b80b9", "hex");
-const singleLittleArc = Buffer.from(littleArc);
-singleLittleArc.set(Buffer.from("c1fbfff021a02091e00318aaea2d5697280080521b000014", "hex"), 16);
 // A user-opened URL must be routed even without an account. Keep the original
 // Optional<AuthSession> cleanup, then enter native local URL routing.
 const externalURL = Buffer.from("011802f021002d9142a301f042803991e00314aad05ef99760000014", "hex");
 const localExternalURL = Buffer.from(externalURL);
 localExternalURL.set(Buffer.from("1a000014", "hex"), 24);
-// JSONEncoder.OutputFormatting is resilient and returned indirectly through x8.
-// On the verified Foundation ABI its rawValue occupies eight bytes. Zero that
-// result buffer, not x0 (which is overwritten before outputFormatting.setter).
-const storableFormatting = Buffer.from("b78350f8e80317aa44dc9f94e00317aa4bdc9f94", "hex");
-const compactFormatting = Buffer.from(storableFormatting);
-compactFormatting.set(Buffer.from("1f0100f9", "hex"), 8); // str xzr, [x8]
-// LDConfig.startOnline defaults true. Use the SDK's native offline startup so
-// locally blocked streaming/event requests do not create a retry loop.
-const launchDarklyConfig = Buffer.from("884280b9bf6a2838884a80b929008052a96a2838884e80b9bf6a28389a5280b9", "hex");
-const offlineLaunchDarklyConfig = Buffer.from(launchDarklyConfig);
-offlineLaunchDarklyConfig.set(Buffer.from("bf6a2838", "hex"), 16); // strb wzr, [x21, x8]
 // MainWindowController's New Tab action has its own nil-session guard. The
 // preceding code has already destroyed its WindowState snapshot. Continue into
 // Arc's native .mainMenu(.newTab) action with the original controller and sender.
@@ -84,10 +67,7 @@ localSavedWindowRestore.set(Buffer.from("1f2003d5", "hex"), 20);
 const patches: readonly Patch[] = [
   { address: 0x10186b3b0n, original: onboarding, replacement: localOnboarding },
   { address: windowAddress, original: Buffer.from("000080d2678f8697f40300aa08805ff8081940f9e00316aa21008052e20314aa00013fd61f04007101070054", "hex"), replacement: localWindow },
-  { address: 0x102a7cb50n, original: littleArc, replacement: singleLittleArc },
   { address: 0x1001af7e8n, original: externalURL, replacement: localExternalURL },
-  { address: 0x100dab520n, original: storableFormatting, replacement: compactFormatting },
-  { address: 0x10143425cn, original: launchDarklyConfig, replacement: offlineLaunchDarklyConfig },
   { address: 0x10031caf4n, original: newTab, replacement: localNewTab },
   { address: 0x101f5f79cn, original: settingsCloudStatus, replacement: localSettingsCloudStatus },
   { address: 0x100313cd0n, original: menuValidation, replacement: localMenuValidation },
@@ -139,5 +119,5 @@ if (import.meta.main) {
   const allowed = ["ArcMod", "ArcModValidation"].map((name) => join(import.meta.dir, `../build/${name}.app/Contents/MacOS/Arc`));
   if (!file || !allowed.some((path) => realpathSync(file) === join(path))) throw new Error("patch only an ArcMod build executable");
   writeFileSync(file, patchLocalMode(readFileSync(file)));
-  console.log("local mode: onboarding disabled, local windows and single Little Arc enabled; performance: compact state JSON, LaunchDarkly offline; account state unchanged");
+  console.log("local mode: onboarding disabled, local windows enabled; account state unchanged");
 }
