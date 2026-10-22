@@ -5,7 +5,7 @@
   "scripts": {
     "typecheck": "tsgo --noEmit",
     "lint": "oxlint tools",
-    "test": "bun test ./tools/local-mode.test.ts ./tools/agent-session.test.ts ./tools/agent-cdp.test.ts tools/agent-control.test.ts && bun tools/test-service-policy.ts && bun tools/test-shortcut-policy.ts",
+    "test": "bun test ./tools/import-arc-data.test.ts ./tools/local-mode.test.ts ./tools/agent-session.test.ts ./tools/agent-cdp.test.ts ./tools/agent-control.test.ts && bun tools/test-service-policy.ts && bun tools/test-shortcut-policy.ts",
     "symbols": "bun tools/build-symbol-map.ts",
     "profile": "bun tools/profile-arc.ts"
   },
