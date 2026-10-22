@@ -32,6 +32,7 @@
 - Native patches also need a rebuilt, signed app and relevant live behavior checks.
   Use disposable localhost tabs and preserve user tabs and data.
 - Keep `/Applications/Arc.app` and the original Arc profile untouched. Do not commit
-  browser data, credentials, generated dumps, app bundles or profiling captures.
+  browser data, credentials, app bundles or profiling captures. The 1.168.0
+  decompile and dumps are tracked with Git LFS; the Ghidra project stays local.
 - Record current findings and validation limits in `notes/`. Passing binary tests
   does not prove every shortcut works; separate source checks from live results.
