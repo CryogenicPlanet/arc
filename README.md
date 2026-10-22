@@ -30,6 +30,22 @@ tools/run-mod.sh
 The build clones Arc, applies the mod, and signs the copy. Use the launcher so the
 local service settings and Chromium resolver rules are applied.
 
+## Import Arc logins
+
+To keep sites signed in, copy stock Arc's Chromium profile (cookies, site storage,
+extensions, history and permissions) into ArcMod. Quit both apps first, then run:
+
+```sh
+bun tools/import-arc-data.ts
+```
+
+macOS asks to read "Arc Safe Storage". Choose **Allow**, not "Always Allow". ArcMod
+uses Chromium's mock keychain, so the importer re-encrypts every OSCrypt value,
+including the tracked-pref hashes. Without this, Chromium drops the extensions.
+Imported sessions are then protected only by the public mock key. Arc's data is only
+read. ArcMod's previous profile is kept as `Default.pre-import-<timestamp>`. Sidebar
+spaces and Arc account data are not copied.
+
 ## Checks
 
 Extract the original binary once so the binary patch tests run:
