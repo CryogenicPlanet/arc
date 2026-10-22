@@ -44,24 +44,24 @@ spaces and Arc account data are not copied.
 
 ## Checks
 
-Extract the original binary once so the binary patch tests run:
+Run the source checks:
 
 ```sh
-mkdir -p bin
-lipo /Applications/Arc.app/Contents/MacOS/Arc -thin arm64 -output bin/Arc.arm64
-
 bun run typecheck
 bun run lint
 bun run test
 ```
 
-Binary tests skip when `bin/Arc.arm64` is missing. Generated binaries, app builds and
-profiles are ignored by Git.
+Binary tests skip when `bin/Arc.arm64` is missing. It is the original Arc 1.168.0 arm64
+executable, stored with Git LFS because Arc's auto-update replaces the installed copy.
+`bin/Arc-1.168.0-88413.app.tar.xz` is the matching app bundle; unpack it and pass its absolute path as
+`--source` to `bun tools/build-mod.ts` when the installed Arc isn't 1.168.0. Other
+generated binaries, app builds and profiles are ignored by Git.
 
 ## Reverse-engineering artifacts
 
 The Arc 1.168.0 decompile (`ghidra/decomp/`, `ghidra/functions.tsv`) and symbol and
-class dumps (`dump/`) are stored with Git LFS, about 350 MB in total.
+class dumps (`dump/`) are stored with Git LFS, about 730 MB in total with `bin/`.
 Install Git LFS before cloning. The analyzed Ghidra project (`ghidra/project/`) stays
 local and is ignored by Git.
 

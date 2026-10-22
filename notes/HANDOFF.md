@@ -94,7 +94,9 @@ Little Snitch (`*.arc.net`, `*.diabrowser.engineering`, `firestore.googleapis.co
 
 ## Reverse-engineering assets (all under the repo)
 
-- `bin/Arc.arm64` — thin arm64 slice of `Contents/MacOS/Arc` (80MB, stripped; Swift metadata intact). gitignored.
+- `bin/Arc.arm64` — thin arm64 slice of `Contents/MacOS/Arc` (80MB, stripped; Swift metadata intact). Git LFS; the only pristine 1.168.0 copy after Arc's 1.169.0 update.
+- `bin/Arc-1.168.0-88413.app.tar.xz` — reassembled Arc 1.168.0 app bundle (Git LFS). Unpack it and pass its
+  absolute path as `--source` to `bun tools/build-mod.ts` when the installed Arc isn't 1.168.0.
 - `dump/swift-types.swift` — ipsw swift-dump, 37.5k types, `Module.Type` format. Line numbers cited everywhere.
 - `dump/objc-classes.re.h` — ObjC class-dump **with method addresses** (`// 0x…` before each method).
 - `dump/symbol-map.tsv` — 15,806 addr→name entries (nm + objc + swift), demangled. Rebuild: `bun tools/build-symbol-map.ts`.
@@ -178,6 +180,6 @@ wins, patch recipe, live flag values) and `notes/agent-control-surface.md`. Key 
 4. Build the agent-control MCP server (AppleScript + CDP).
 5. For "no sign-in / no Browser Co. calls": confirm the onboarding no-account path; set up per-app
    egress blocking (LuLu/Little Snitch) rather than patching account code.
-6. `git init` the repo (bin/, build/, ghidra/project|logs/, profiles/, node_modules/ are gitignored).
+6. `git init` the repo (build/, ghidra/project|logs/, profiles/, node_modules/ are gitignored).
 
 Memory: see `[[arc-modding-goal]]` and `[[arc-re-workspace]]` in Claude memory.
