@@ -138,6 +138,53 @@ or the `--source` you pass), which takes no extra disk space. It then:
 The Chromium engine is unchanged. [local-mode.md](notes/local-mode.md) and the
 [account-guard audit](notes/local-guard-audit.md) describe every patch.
 
+## Our own engine (experimental)
+
+Arc shuts down on 2026-12-22, and its engine (ArcCore, Chromium 156) won't get
+security updates after that. We're building a replacement `ArcCore.framework` from
+Google's Chromium source, so ArcMod can keep moving to new Chromium releases. It
+lives in a separate repo, `~/general/arc-engine`:
+
+- `arc/` implements Arc's engine interface (146 classes) on top of Chromium.
+- `patches/` holds the small Chromium changes it needs, all gated to Arc-hosted mode.
+- Every behavior is checked against Arc's own engine: a recorder logs every call
+  between Arc's app and the engine, and test scenarios are diffed against
+  recordings made on Arc's engine.
+
+**Not ready for your daily profile yet.** Every engine method Arc's app calls is now
+implemented. These behave like Arc's engine in recorded scenarios:
+
+- launching, quitting and relaunching with cookies and storage intact;
+- profiles: creating, loading and deleting;
+- tabs and navigation;
+- downloads;
+- media and picture-in-picture;
+- PDFs;
+- bookmarks and history;
+- extensions' page actions;
+- password, address and card save offers;
+- passkey dialogs.
+
+Features you reach through Arc's own UI (command bar, menus, shortcuts, Little Arc,
+Settings) still need checks on an unlocked screen. Boosts' color filters aren't
+drawn yet.
+
+To try it, build the engine, then build ArcMod on it with `--engine`. Use the release
+build: development builds stop on internal debug checks that Arc's shipped engine
+skipped.
+
+```sh
+cd ~/general/arc-engine && ./sync-chromium.sh && ./build-babysit.sh   # first time: hours
+cd chromium/src && gn gen out/Release --args='is_debug=false dcheck_always_on=false symbol_level=1 target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="Chrome" enable_nacl=false'
+autoninja -C out/Release chrome
+cd ~/general/arc
+bun tools/build-mod.ts --validation \
+  --engine ~/general/arc-engine/chromium/src/out/Release/Chromium.app/Contents/Frameworks/ArcCore.framework
+```
+
+`--engine` replaces Arc's engine in the copy with the given framework (it checks
+the layout and install name first). Without it, ArcMod uses Arc's own engine as before.
+
 ## Development
 
 ```sh
