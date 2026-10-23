@@ -34,14 +34,22 @@ export const sessionIdentity = (validation = false, agent?: string): SessionIden
   };
 };
 
-export const parseBuildOptions = (args: readonly string[]): { readonly source: string; readonly session: SessionIdentity } => {
+export interface BuildOptions {
+  readonly source: string;
+  readonly session: SessionIdentity;
+  // An ArcCore.framework to use instead of the source app's own engine (e.g. one built from Chromium).
+  readonly engine?: string;
+}
+
+export const parseBuildOptions = (args: readonly string[]): BuildOptions => {
   let source = "/Applications/Arc.app";
   let validation = false;
   let agent: string | undefined;
+  let engine: string | undefined;
   const seen = new Set<string>();
   for (let index = 0; index < args.length; index++) {
     const flag = args[index]!;
-    if (!["--source", "--validation", "--agent"].includes(flag)) throw new Error(`unrecognized build argument: ${flag}`);
+    if (!["--source", "--validation", "--agent", "--engine"].includes(flag)) throw new Error(`unrecognized build argument: ${flag}`);
     if (seen.has(flag)) throw new Error(`duplicate build argument: ${flag}`);
     seen.add(flag);
     if (flag === "--validation") {
@@ -51,7 +59,9 @@ export const parseBuildOptions = (args: readonly string[]): { readonly source: s
     const value = args[++index];
     if (!value || value.startsWith("--")) throw new Error(`missing value for ${flag}`);
     if (flag === "--source") source = value;
+    else if (flag === "--engine") engine = value;
     else agent = validateAgentSlug(value);
   }
-  return { source, session: sessionIdentity(validation, agent) };
+  const session = sessionIdentity(validation, agent);
+  return engine === undefined ? { source, session } : { source, session, engine };
 };

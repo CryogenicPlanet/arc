@@ -7,6 +7,7 @@
 // /Applications/Arc.app is never modified.
 //
 //   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation | --agent <slug>]
+//                          [--engine <ArcCore.framework>]   (our engine built from Chromium; see README)
 
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -21,7 +22,7 @@ import { acquireLease } from "./agent-lease";
 const buildLease = acquireLease("global", join(homedir(), ".arcmod", "build-locks"));
 process.on("exit", () => buildLease.release());
 const root = join(import.meta.dir, "..");
-const { source: SOURCE, session } = parseBuildOptions(Bun.argv.slice(2));
+const { source: SOURCE, session, engine: ENGINE } = parseBuildOptions(Bun.argv.slice(2));
 const { appName, bundleId: MOD_BUNDLE_ID } = session;
 const OUT = join(root, `build/${appName}.app`);
 const DYLIB_INSTALL = "@executable_path/../Frameworks/ArcMod.dylib";
@@ -87,6 +88,20 @@ step(`APFS-clone app → build/${appName}.app`);
 assertOutputStopped();
 rmSync(OUT, { recursive: true, force: true });
 sh(["cp", "-cR", SOURCE, OUT]);
+if (ENGINE !== undefined) {
+  // Arc's app links @executable_path/../Frameworks/ArcCore.framework/Versions/A/ArcCore; the replacement
+  // must have that layout and install name. It is re-signed with the rest of the bundle below.
+  const engineBinary = join(ENGINE, "Versions/A/ArcCore");
+  if (!existsSync(engineBinary)) throw new Error(`not an ArcCore.framework (no Versions/A/ArcCore): ${ENGINE}`);
+  const installName = sh(["otool", "-D", engineBinary]).trim().split("\n").at(-1)?.trim();
+  if (installName !== "@executable_path/../Frameworks/ArcCore.framework/Versions/A/ArcCore") {
+    throw new Error(`engine install name is ${installName}, expected Arc's ArcCore path`);
+  }
+  step(`engine → ${ENGINE}`);
+  const frameworks = join(OUT, "Contents/Frameworks/ArcCore.framework");
+  rmSync(frameworks, { recursive: true, force: true });
+  sh(["cp", "-cR", ENGINE, frameworks]);
+}
 sh(["xattr", "-cr", OUT], { quiet: true });
 
 step("Info.plist: bundle id, display name, Sparkle off");

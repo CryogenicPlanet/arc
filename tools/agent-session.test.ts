@@ -30,10 +30,12 @@ describe("agent build identity", () => {
   test("accepts arbitrary option order and source paths containing spaces", () => {
     expect(parseBuildOptions(["--agent", "scout", "--source", "/tmp/My Arc.app"])).toEqual({ source: "/tmp/My Arc.app", session: sessionIdentity(false, "scout") });
     expect(parseBuildOptions([]).source).toBe("/Applications/Arc.app");
+    expect(parseBuildOptions(["--engine", "/tmp/out/ArcCore.framework"]).engine).toBe("/tmp/out/ArcCore.framework");
+    expect(parseBuildOptions([]).engine).toBeUndefined();
   });
 
   test("rejects conflicting, duplicate, incomplete and unknown arguments", () => {
-    for (const args of [["--validation", "--agent", "scout"], ["--agent"], ["--source"], ["--source", "--validation"], ["--agent", "scout", "--agent", "scout"], ["--validation", "--validation"], ["--source", "x", "--source", "y"], ["--unknown"], ["positional"], ["--agent=scout"]]) {
+    for (const args of [["--validation", "--agent", "scout"], ["--agent"], ["--source"], ["--source", "--validation"], ["--agent", "scout", "--agent", "scout"], ["--validation", "--validation"], ["--source", "x", "--source", "y"], ["--engine"], ["--engine", "a", "--engine", "b"], ["--unknown"], ["positional"], ["--agent=scout"]]) {
       expect(() => parseBuildOptions(args)).toThrow();
     }
   });
