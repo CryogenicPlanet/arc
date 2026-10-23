@@ -158,6 +158,35 @@ or the `--source` you pass), which takes no extra disk space. It then:
 The Chromium engine is unchanged. [local-mode.md](notes/local-mode.md) and the
 [account-guard audit](notes/local-guard-audit.md) describe every patch.
 
+## Our own engine (experimental, in progress)
+
+Arc shuts down on 2026-12-22, and its engine (ArcCore, Chromium 156) won't get
+security updates after that. We're building a replacement `ArcCore.framework` from
+Google's Chromium source, so ArcMod can keep moving to new Chromium releases. It
+lives in a separate repo, `~/general/arc-engine`:
+
+- `arc/` implements Arc's engine interface (146 classes) on top of Chromium.
+- `patches/` holds the small Chromium changes it needs, all gated to Arc-hosted mode.
+- Every behavior is checked against Arc's own engine: a recorder logs every call
+  between Arc's app and the engine, and test scenarios are diffed against
+  recordings made on Arc's engine.
+
+**It isn't feature complete yet.** Launching, profiles, opening and navigating
+pages, closing tabs and keeping cookies and storage across restarts work; quitting
+and many features are still being finished. Don't use it for your daily profile yet.
+
+To try it, build the engine, then build ArcMod on it with `--engine`:
+
+```sh
+cd ~/general/arc-engine && ./sync-chromium.sh && ./build-babysit.sh   # first time: hours
+cd ~/general/arc
+bun tools/build-mod.ts --validation \
+  --engine ~/general/arc-engine/chromium/src/out/Base/Chromium.app/Contents/Frameworks/ArcCore.framework
+```
+
+`--engine` replaces Arc's engine in the copy with the given framework (it checks
+the layout and install name first). Without it, ArcMod uses Arc's own engine as before.
+
 ## Development
 
 ```sh
