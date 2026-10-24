@@ -43,11 +43,11 @@ export const parseCDPOptions = (args: readonly string[]): CDPOptions => {
   }
   const agent = values.get("--agent");
   const port = values.get("--port");
-  if (!agent || !port) throw new Error("usage: bun tools/agent-cdp.ts --agent <slug> --port <port> list|open URL|navigate TARGET URL|evaluate TARGET EXPRESSION|screenshot TARGET PATH|click TARGET X Y|type TARGET TEXT|close TARGET");
+  if (!agent || !port) throw new Error("usage: bun tools/agent-cdp.ts --agent <slug> --port <port> list|open URL|navigate TARGET URL|evaluate TARGET EXPRESSION|screenshot TARGET PATH|click TARGET X Y|type TARGET TEXT|close TARGET|activate TARGET");
   sessionIdentity(false, agent);
   const name = args[index++];
   const commandArgs = args.slice(index);
-  const counts: Record<string, number> = { list: 0, open: 1, navigate: 2, evaluate: 2, screenshot: 2, click: 3, type: 2, close: 1 };
+  const counts: Record<string, number> = { list: 0, open: 1, navigate: 2, evaluate: 2, screenshot: 2, click: 3, type: 2, close: 1, activate: 1 };
   if (!name || !Object.hasOwn(counts, name)) throw new Error(`unrecognized command: ${name ?? "(missing)"}`);
   if (commandArgs.length !== counts[name]) throw new Error(`wrong argument count for ${name}`);
   if (name === "open") navigationURL(commandArgs[0]!);
@@ -299,6 +299,8 @@ export const executeCommand = async (client: AgentCDP, command: Command): Promis
       if (result.success !== true) throw new Error("target did not close");
       return { targetId: id, ...result };
     }
+    // Asks the browser to show the tab (DevTools ActivateTarget, which the engine hands to the app).
+    case "activate": return { targetId: id, ...await client.request("Target.activateTarget", { targetId: id! }) };
     default: throw new Error(`unsupported connected command: ${command.name}`);
   }
 };
