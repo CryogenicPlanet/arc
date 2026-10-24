@@ -163,47 +163,55 @@ The Chromium engine is unchanged. [local-mode.md](notes/local-mode.md) and the
 Arc shuts down on 2026-12-22, and its engine (ArcCore, Chromium 156) won't get
 security updates after that. We're building a replacement `ArcCore.framework` from
 Google's Chromium source, so ArcMod can keep moving to new Chromium releases. It
-lives in a separate repo, `~/general/arc-engine`:
+lives in its own repo, [`arc-engine`](https://github.com/CryogenicPlanet/arc-engine)
+(private), checked out here as the `engine/` submodule:
 
 - `arc/` implements Arc's engine interface (146 classes) on top of Chromium.
 - `patches/` holds the small Chromium changes it needs, all gated to Arc-hosted mode.
+  Chromium itself isn't vendored: `sync-chromium.sh` fetches the pinned revision and
+  applies the patches.
 - Every behavior is checked against Arc's own engine: a recorder logs every call
   between Arc's app and the engine, and test scenarios are diffed against
   recordings made on Arc's engine.
 
-**Not ready for your daily profile yet.** Every engine method Arc's app calls is now
+**Not ready for your daily profile yet.** Every engine method Arc's app calls is
 implemented. These behave like Arc's engine in recorded scenarios:
 
-- launching, quitting and relaunching with cookies and storage intact;
-- profiles: creating, loading and deleting;
+- launching, quitting (with the quit warning) and relaunching with cookies and storage intact;
+- profiles: creating and switching them in Arc's UI, with separate data that survives a restart;
+- Settings, the command bar and the agent tools;
 - tabs and navigation;
 - downloads;
-- media and picture-in-picture;
+- media and picture-in-picture, including the auto-PiP policies;
 - PDFs;
 - bookmarks and history;
+- importing from Chrome, Edge, Brave, Vivaldi, Opera and Arc: history, bookmarks,
+  cookies, passwords, cards and extensions;
 - extensions' page actions;
 - password, address and card save offers;
 - passkey dialogs.
 
-Features you reach through Arc's own UI (command bar, menus, shortcuts, Little Arc,
-Settings) still need checks on an unlocked screen. Boosts' color filters aren't
-drawn yet.
+Still open: archiving a tab that was opened in the background, importing a folder that
+Safari exported, and Boosts' color filters. The engine's `NEXT.md` has the full list.
 
 To try it, build the engine, then build ArcMod on it with `--engine`. Use the release
 build: development builds stop on internal debug checks that Arc's shipped engine
-skipped.
+skipped. The Chromium checkout needs about 100 GB.
 
 ```sh
-cd ~/general/arc-engine && ./sync-chromium.sh && ./build-babysit.sh   # first time: hours
+git submodule update --init engine
+cd engine && ./sync-chromium.sh && ./build-babysit.sh   # first time: hours
 cd chromium/src && gn gen out/Release --args='is_debug=false dcheck_always_on=false symbol_level=1 target_cpu="arm64" proprietary_codecs=true ffmpeg_branding="Chrome" enable_nacl=false'
 autoninja -C out/Release chrome
-cd ~/general/arc
+cd ../../..
 bun tools/build-mod.ts --validation \
-  --engine ~/general/arc-engine/chromium/src/out/Release/Chromium.app/Contents/Frameworks/ArcCore.framework
+  --engine engine/chromium/src/out/Release/Chromium.app/Contents/Frameworks/ArcCore.framework
 ```
 
 `--engine` replaces Arc's engine in the copy with the given framework (it checks
 the layout and install name first). Without it, ArcMod uses Arc's own engine as before.
+The engine's parity tests expect the engine checked out next to ArcMod
+(`../arc-engine`) rather than as the submodule.
 
 ## Development
 
