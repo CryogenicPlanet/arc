@@ -6,6 +6,11 @@
 ArcMod is a modified copy of the [Arc browser](https://arc.net) for macOS. You can
 browse without signing in, and Arc's own services are blocked.
 
+ArcMod runs on Arc's own engine today. Its sister repo,
+[**Arc Engine**](https://github.com/CryogenicPlanet/arc-engine), rebuilds that engine
+(Arc's `ArcCore.framework`) from Chromium source, so ArcMod can keep getting Chromium
+security updates after Arc shuts down. See [Arc Engine](#arc-engine-experimental).
+
 It builds a **separate app** next to your normal Arc. Your installed Arc and its data
 are never modified.
 
@@ -135,44 +140,33 @@ or the `--source` you pass), which takes no extra disk space. It then:
    enables local menu actions.
 4. Re-signs the copy ad hoc.
 
-The Chromium engine is unchanged. [local-mode.md](notes/local-mode.md) and the
+Arc's engine is left unchanged unless you build with `--engine`
+([Arc Engine](#arc-engine-experimental)). [local-mode.md](notes/local-mode.md) and the
 [account-guard audit](notes/local-guard-audit.md) describe every patch.
 
-## Our own engine (experimental)
+## Arc Engine (experimental)
 
-Arc shuts down on 2026-12-22, and its engine (ArcCore, Chromium 156) won't get
-security updates after that. We're building a replacement `ArcCore.framework` from
-Google's Chromium source, so ArcMod can keep moving to new Chromium releases. It
-lives in its own repo, [`arc-engine`](https://github.com/CryogenicPlanet/arc-engine)
-(private), checked out here as the `engine/` submodule:
+Arc is two pieces: the Swift app that this repo patches, and `ArcCore.framework`,
+its engine. ArcCore is The Browser Company's build of Chromium plus an Objective-C
+API the app calls. Arc shuts down on 2026-12-22, and its engine stops at Chromium 156
+with no security updates after that.
 
-- `arc/` implements Arc's engine interface (146 classes) on top of Chromium.
-- `patches/` holds the small Chromium changes it needs, all gated to Arc-hosted mode.
-  Chromium itself isn't vendored: `sync-chromium.sh` fetches the pinned revision and
-  applies the patches.
-- Every behavior is checked against Arc's own engine: a recorder logs every call
-  between Arc's app and the engine, and test scenarios are diffed against
-  recordings made on Arc's engine.
+[**Arc Engine**](https://github.com/CryogenicPlanet/arc-engine) is our replacement
+ArcCore, built from Google's Chromium source. It's included here as the `engine/`
+submodule, pinned to the engine commit this ArcMod commit was tested with.
+
+It isn't a fork of Chromium. The repo holds our own implementation of Arc's engine
+API and a few small Chromium patches, and its scripts check out an unmodified
+Chromium and build them into it. Its behavior is checked against Arc's own engine:
+a recorder logs each call between Arc's app and the engine, and test scenarios are
+diffed against recordings made on Arc's engine.
 
 **Not ready for your daily profile yet.** Every engine method Arc's app calls is
-implemented. These behave like Arc's engine in recorded scenarios:
-
-- launching, quitting (with the quit warning) and relaunching with cookies and storage intact;
-- profiles: creating and switching them in Arc's UI, with separate data that survives a restart;
-- Settings and the command bar;
-- tabs and navigation;
-- downloads;
-- media and picture-in-picture, including the auto-PiP policies;
-- PDFs;
-- bookmarks and history;
-- importing from Chrome, Edge, Brave, Vivaldi, Opera and Arc: history, bookmarks,
-  cookies, passwords, cards and extensions;
-- extensions' page actions;
-- password, address and card save offers;
-- passkey dialogs.
-
-Still open: archiving a tab that was opened in the background, importing a folder that
-Safari exported, and Boosts' color filters. The engine's `NEXT.md` has the full list.
+implemented, and launching, profiles, Settings, the command bar, tabs, downloads,
+media, PDFs, bookmarks, history and importing from other browsers behave like
+Arc's engine in tests. A few gaps remain, such as archiving a tab that was opened in
+the background. [Arc Engine's README](https://github.com/CryogenicPlanet/arc-engine#status)
+has the full status.
 
 To try it, build the engine, then build ArcMod on it with `--engine`. Use the release
 build: development builds stop on internal debug checks that Arc's shipped engine
@@ -190,8 +184,9 @@ bun tools/build-mod.ts --validation \
 
 `--engine` replaces Arc's engine in the copy with the given framework (it checks
 the layout and install name first). Without it, ArcMod uses Arc's own engine as before.
-The engine's parity tests expect the engine checked out next to ArcMod
-(`../arc-engine`) rather than as the submodule.
+To work on the engine itself, see
+[Running the tests](https://github.com/CryogenicPlanet/arc-engine#running-the-tests)
+in its README.
 
 ## Development
 
@@ -210,6 +205,7 @@ unless it's 1.168.0.
 - `tools/`: build, patch, launch, import, profiling and test scripts
 - `resources/`: Arc metadata and policy definitions
 - `bin/`: Arc 1.168.0's executable (for tests) and app bundle (for builds), in Git LFS
+- `engine/`: the [Arc Engine](https://github.com/CryogenicPlanet/arc-engine) submodule
 - `ghidra/`, `dump/`: Arc 1.168.0 decompile and symbol dumps (Git LFS); the analyzed
   Ghidra project stays local
 - `notes/`: findings, runtime evidence and handoffs; start with
