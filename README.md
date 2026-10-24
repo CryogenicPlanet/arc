@@ -159,7 +159,7 @@ implemented. These behave like Arc's engine in recorded scenarios:
 
 - launching, quitting (with the quit warning) and relaunching with cookies and storage intact;
 - profiles: creating and switching them in Arc's UI, with separate data that survives a restart;
-- Settings, the command bar and the agent tools;
+- Settings and the command bar;
 - tabs and navigation;
 - downloads;
 - media and picture-in-picture, including the auto-PiP policies;
