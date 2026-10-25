@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Launches build/ArcMod.app next to (and isolated from) the real Arc.
-#   tools/run-mod.sh [--validation] [--guard] [extra Chromium switches…]
+# Launches ArcMod next to (and isolated from) the real Arc. The everyday ArcMod is installed in /Applications
+# (or ~/Applications) and also opens like any app; --debug launches build/ArcMod.app (build-mod.ts --debug).
+#   tools/run-mod.sh [--validation | --debug | --app <ArcMod.app>] [--guard] [extra Chromium switches…]
 #
 # Isolation: build-mod.ts sets CFBundleName=ArcMod, and Arc names its data folder after it, so all
 # state (sidebar JSON and Chromium "User Data") lives in ~/Library/Application Support/ArcMod.
@@ -17,18 +18,35 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 GUARD=0
+DEBUG=0
+APP_PATH=""
 APP_NAME=ArcMod
 DOMAIN=company.thebrowser.Browser.mod
-while [[ "${1:-}" == "--guard" || "${1:-}" == "--validation" ]]; do
-  if [[ "$1" == "--guard" ]]; then GUARD=1; else APP_NAME=ArcModValidation; DOMAIN=company.thebrowser.Browser.mod.validation; fi
-  shift
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --guard) GUARD=1; shift ;;
+    --validation) APP_NAME=ArcModValidation; DOMAIN=company.thebrowser.Browser.mod.validation; shift ;;
+    --debug) DEBUG=1; shift ;;
+    --app) [[ $# -ge 2 && -n "$2" ]] || { echo "missing value for --app" >&2; exit 1; }; APP_PATH="$2"; shift 2 ;;
+    *) break ;;
+  esac
 done
 APP="$ROOT/build/$APP_NAME.app"
+if [[ -n "$APP_PATH" ]]; then
+  APP="$APP_PATH"
+  APP_NAME="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' "$APP/Contents/Info.plist" 2>/dev/null || true)"
+  [[ "$APP_NAME" == ArcMod || "$APP_NAME" == ArcModValidation ]] || { echo "not an ArcMod app: $APP" >&2; exit 1; }
+  [[ "$APP_NAME" == ArcMod ]] || DOMAIN=company.thebrowser.Browser.mod.validation
+elif [[ "$APP_NAME" == ArcMod && $DEBUG == 0 ]]; then
+  for INSTALLED in /Applications/ArcMod.app "$HOME/Applications/ArcMod.app"; do
+    if [[ -d "$INSTALLED" ]]; then APP="$INSTALLED"; break; fi
+  done
+fi
 EXE="$APP/Contents/MacOS/Arc"
 DATA="$HOME/Library/Application Support/$APP_NAME"
 LOG="$ROOT/build/$APP_NAME-run.log"
 
-[[ -x "$EXE" ]] || { echo "build first: bun tools/build-mod.ts" >&2; exit 1; }
+[[ -x "$EXE" ]] || { echo "build first: bun tools/build-mod.ts$([[ $DEBUG == 0 ]] || echo ' --debug')" >&2; exit 1; }
 MOD_PIDS="$(pgrep -f "(^|/)$APP_NAME[.]app/Contents/MacOS/Arc( |$)" || true)"
 if [[ -n "$MOD_PIDS" ]]; then echo "ArcMod already running (pid $MOD_PIDS)" >&2; exit 1; fi
 defaults write "$DOMAIN" cloudKitSyncEnabled -bool false

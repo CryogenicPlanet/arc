@@ -2,13 +2,13 @@
 // Updates this checkout to the newest ArcMod release for its branch and rebuilds ArcMod with the same engine.
 //   bun tools/update.ts                         update and rebuild; if ArcMod is open, waits for you to quit it
 //   bun tools/update.ts --check                 only report
-//   bun tools/update.ts --quit-arcmod --relaunch
+//   bun tools/update.ts --quit-arcmod --relaunch [--app <ArcMod.app>]
 //       what ArcMod's "Update…" menu item runs: everything that can fail (checks, source update, build) happens
 //       while ArcMod keeps running; then it asks ArcMod to quit, swaps in the new build and reopens ArcMod.
 // Releases are tags: vX.Y.Z on master and vX.Y.Z-no-login on no-login.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { finalApp, runningApp, stagedApp, swapInStagedApp } from "./build-paths";
+import { everydayApp, flagValue, runningAt, stagedApp, swapInStagedApp } from "./build-paths";
 
 const root = join(import.meta.dir, "..");
 const RELEASES = "https://api.github.com/repos/CryogenicPlanet/arc/releases?per_page=50";
@@ -63,16 +63,19 @@ export const latestRelease = async (channel: Channel): Promise<Release | undefin
     .toSorted((a, b) => compareVersions(b.version, a.version))[0];
 };
 
+// The everyday ArcMod: the copy ArcMod's menu names with --app, else the installed one, else a --debug build.
+const target = everydayApp(flagValue(process.argv, "--app"));
+
 // The release the built app came from, from the ArcModVersion that tools/build-mod.ts stamps (`git describe`).
 const builtVersion = (channel: Channel): Version | undefined => {
-  const plist = join(finalApp(APP), "Contents/Info.plist");
+  const plist = join(target.path, "Contents/Info.plist");
   if (!existsSync(plist)) return undefined;
   const stamp = Bun.spawnSync(["defaults", "read", plist, "ArcModVersion"]).stdout.toString().trim();
   return parseVersion(stamp.replace(/-\d+-g[0-9a-f]+/, "").replace(/-dirty$/, ""), channel);
 };
 
 const builtEngine = (): string => {
-  const plist = join(finalApp(APP), "Contents/Info.plist");
+  const plist = join(target.path, "Contents/Info.plist");
   const engine = existsSync(plist) ? Bun.spawnSync(["defaults", "read", plist, "ArcModBuildEngine"]).stdout.toString().trim() : "";
   return engine === "" || engine === "arc" ? "arc" : engine;
 };
@@ -83,9 +86,9 @@ const run = (command: readonly string[], what: string): void => {
   if (!result.success) throw new Error(`${what} failed`);
 };
 
-const arcModRunning = (): boolean => runningApp(APP).length > 0;
+const arcModRunning = (): boolean => runningAt(target.path).length > 0;
 
-const relaunch = (): void => void Bun.spawnSync([join(root, "tools/run-mod.sh")], { cwd: root, stdout: "inherit", stderr: "inherit" });
+const relaunch = (): void => void Bun.spawnSync([join(root, "tools/run-mod.sh"), "--app", target.path], { cwd: root, stdout: "inherit", stderr: "inherit" });
 
 const update = async (args: ReadonlySet<string>): Promise<void> => {
   const channel = currentChannel();
@@ -122,7 +125,7 @@ const update = async (args: ReadonlySet<string>): Promise<void> => {
   }
 
   const engine = builtEngine();
-  run(["bun", "tools/build-mod.ts", "--stage-only", ...(engine === "arc" ? [] : ["--engine", engine])],
+  run(["bun", "tools/build-mod.ts", "--stage-only", ...(target.debug ? ["--debug"] : []), ...(engine === "arc" ? [] : ["--engine", engine])],
     `build ArcMod (${engine === "arc" ? "Arc's engine" : `engine: ${engine}`})`);
   if (arcModRunning()) {
     if (args.has("--quit-arcmod")) {
@@ -133,7 +136,7 @@ const update = async (args: ReadonlySet<string>): Promise<void> => {
     }
     while (arcModRunning()) await Bun.sleep(500);
   }
-  swapInStagedApp(APP);
+  swapInStagedApp(APP, target.path);
   console.log(`\nArcMod is now ${latest.tag}.`);
 };
 
@@ -146,6 +149,6 @@ if (import.meta.main) {
     process.exitCode = 1;
   } finally {
     // From the ArcMod menu: reopen ArcMod whether or not the update worked, unless it's still open.
-    if (args.has("--relaunch") && !arcModRunning() && existsSync(finalApp(APP))) relaunch();
+    if (args.has("--relaunch") && !arcModRunning() && existsSync(target.path)) relaunch();
   }
 }

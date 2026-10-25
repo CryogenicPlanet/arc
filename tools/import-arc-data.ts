@@ -1,6 +1,6 @@
 // Import stock Arc's Chromium profile (logins, site storage, extensions, history,
 // permissions) into an ArcMod session so sites stay signed in.
-//   bun tools/import-arc-data.ts [--validation] [--staging-only] [--quit-arcmod] [--relaunch]
+//   bun tools/import-arc-data.ts [--validation] [--staging-only] [--quit-arcmod] [--relaunch [--app <ArcMod.app>]]
 // --quit-arcmod asks ArcMod to quit after the checks pass and waits for you to quit Arc, instead of failing
 // while either runs; --relaunch reopens ArcMod afterwards, even if the import failed.
 // Arc encrypts secrets with its "Arc Safe Storage" Keychain password; ArcMod launches
@@ -140,7 +140,7 @@ const sessionFor = (validation: boolean) => validation
 
 const main = async (args: readonly string[]): Promise<void> => {
   const flags = new Set(["--validation", "--staging-only", "--quit-arcmod", "--relaunch"]);
-  const unknown = args.filter((arg) => !flags.has(arg));
+  const unknown = args.filter((arg, index) => !flags.has(arg) && !(arg === "--app" || args[index - 1] === "--app"));
   if (unknown.length > 0) throw new Error(`unrecognized argument: ${unknown.join(" ")}`);
   const session = sessionFor(args.includes("--validation"));
   const support = join(process.env.HOME ?? "", "Library/Application Support");
@@ -208,7 +208,9 @@ if (import.meta.main) {
   } finally {
     const validation = args.includes("--validation");
     if (args.includes("--relaunch") && !isRunning(`(^|/)${sessionFor(validation).appName}[.]app/Contents/MacOS/Arc( |$)`)) {
-      Bun.spawnSync([join(import.meta.dir, "run-mod.sh"), ...(validation ? ["--validation"] : [])], { stdout: "inherit", stderr: "inherit" });
+      const app = args.indexOf("--app") >= 0 ? args[args.indexOf("--app") + 1] : undefined;
+      const launch = app ? ["--app", app] : validation ? ["--validation"] : [];
+      Bun.spawnSync([join(import.meta.dir, "run-mod.sh"), ...launch], { stdout: "inherit", stderr: "inherit" });
     }
   }
 }
