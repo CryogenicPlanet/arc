@@ -1,6 +1,9 @@
 // Import stock Arc's Chromium profile (logins, site storage, extensions, history,
 // permissions) into an ArcMod session so sites stay signed in.
-//   bun tools/import-arc-data.ts [--validation] [--staging-only]
+//   bun tools/import-arc-data.ts [--validation] [--staging-only] [--quit-arcmod] [--relaunch]
+// --quit-arcmod asks ArcMod to quit after the checks pass and waits for you to quit Arc, instead of failing
+// while either runs; --relaunch reopens ArcMod afterwards, even if the import failed. ArcMod's
+// "Import from Arc…" menu item runs it with both in Terminal.
 // Arc encrypts secrets with its "Arc Safe Storage" Keychain password; ArcMod launches
 // with --use-mock-keychain, so every OSCrypt v10 value is re-encrypted for the mock key.
 // The source profile is only read. The previous mod profile is kept as a backup.
@@ -127,9 +130,15 @@ const recryptJson = (value: unknown, crypto: Recrypter): { readonly value: unkno
   return { value, converted: 0 };
 };
 
-const main = (): void => {
-  const args = process.argv.slice(2);
-  const unknown = args.filter((arg) => arg !== "--validation" && arg !== "--staging-only");
+const waitUntilClosed = async (pattern: string, message: string): Promise<void> => {
+  if (!isRunning(pattern)) return;
+  console.log(message);
+  while (isRunning(pattern)) await Bun.sleep(500);
+};
+
+const main = async (args: readonly string[]): Promise<void> => {
+  const flags = new Set(["--validation", "--staging-only", "--quit-arcmod", "--relaunch"]);
+  const unknown = args.filter((arg) => !flags.has(arg));
   if (unknown.length > 0) throw new Error(`unrecognized argument: ${unknown.join(" ")}`);
   const session = sessionIdentity(args.includes("--validation"));
   const support = join(process.env.HOME ?? "", "Library/Application Support");
@@ -141,8 +150,15 @@ const main = (): void => {
 
   if (!existsSync(source)) throw new Error(`missing Arc profile: ${source}`);
   if (!existsSync(targetRoot)) throw new Error(`launch ${session.appName} once before importing: ${targetRoot}`);
-  if (isRunning("^/Applications/Arc[.]app/Contents/MacOS/Arc( |$)")) throw new Error("quit Arc first so its profile is consistent");
-  if (isRunning(`(^|/)${session.appName}[.]app/Contents/MacOS/Arc( |$)`)) throw new Error(`quit ${session.appName} first`);
+  const arc = "^/Applications/Arc[.]app/Contents/MacOS/Arc( |$)";
+  const mod = `(^|/)${session.appName}[.]app/Contents/MacOS/Arc( |$)`;
+  if (args.includes("--quit-arcmod")) {
+    if (isRunning(mod)) Bun.spawnSync(["osascript", "-e", `tell application id "${session.bundleId}" to quit`]);
+    await waitUntilClosed(mod, `Waiting for ${session.appName} to quit (confirm in ${session.appName} if it asks)…`);
+    await waitUntilClosed(arc, "Quit Arc to continue: its profile has to be closed while it's copied.");
+  }
+  if (isRunning(arc)) throw new Error("quit Arc first so its profile is consistent");
+  if (isRunning(mod)) throw new Error(`quit ${session.appName} first`);
 
   // Arc's Keychain password is only held in memory. Choose "Allow", not "Always Allow".
   const arcPassword = run("security", ["find-generic-password", "-w", "-s", "Arc Safe Storage", "-a", "Arc"]).trim();
@@ -180,4 +196,19 @@ const main = (): void => {
   console.log(`imported Arc profile into ${target}${existsSync(backup) ? `\nprevious profile kept at ${backup}` : ""}`);
 };
 
-if (import.meta.main) main();
+if (import.meta.main) {
+  const args = process.argv.slice(2);
+  try {
+    await main(args);
+  } catch (error) {
+    console.error(`\nImport stopped: ${error instanceof Error ? error.message : String(error)}`);
+    process.exitCode = 1;
+  } finally {
+    // From the ArcMod menu: reopen ArcMod whether or not the import worked.
+    const validation = args.includes("--validation");
+    const session = sessionIdentity(validation);
+    if (args.includes("--relaunch") && !isRunning(`(^|/)${session.appName}[.]app/Contents/MacOS/Arc( |$)`)) {
+      Bun.spawnSync([join(import.meta.dir, "run-mod.sh"), ...(validation ? ["--validation"] : [])], { stdout: "inherit", stderr: "inherit" });
+    }
+  }
+}
