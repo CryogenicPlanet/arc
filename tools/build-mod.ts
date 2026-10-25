@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
-// Builds build/ArcMod.app: a local-mode APFS clone of /Applications/Arc.app.
+// Builds build/ArcMod.app: a local-mode APFS clone of Arc 1.168.0 (/Applications/Arc.app while it's still
+// 1.168.0, else the copy in bin/).
 //   - own bundle id (company.thebrowser.Browser.mod) and Sparkle auto-update disabled
 //   - arm64 executable, required ArcMod.dylib, fingerprinted local UI/URL/single-Little-Arc patches
 //   - every nested binary re-signed ad hoc, inside-out, WITHOUT hardened runtime (so no library
@@ -7,13 +8,17 @@
 // /Applications/Arc.app is never modified.
 //
 //   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation | --agent <slug>]
-//                          [--engine <ArcCore.framework>]   (our engine built from Chromium; see README)
+//                          [--engine <ArcCore.framework> | --engine release]   (Arc Engine; see README)
 
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { homedir } from "node:os";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
+import { defaultArcSource } from "./arc-source";
+import { fetchEngine } from "./fetch-engine";
+import { finalApp, runningApp, stagedApp, swapInStagedApp } from "./build-paths";
+import { currentChannel, describeArgs } from "./update";
 import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 import { parseBuildOptions } from "./agent-session";
 import { acquireLease } from "./agent-lease";
@@ -22,9 +27,16 @@ import { acquireLease } from "./agent-lease";
 const buildLease = acquireLease("global", join(homedir(), ".arcmod", "build-locks"));
 process.on("exit", () => buildLease.release());
 const root = join(import.meta.dir, "..");
-const { source: SOURCE, session, engine: ENGINE } = parseBuildOptions(Bun.argv.slice(2));
+const options = parseBuildOptions(Bun.argv.slice(2));
+const { session } = options;
+// --engine release: the Arc Engine release this commit pins, downloaded and checked by tools/fetch-engine.ts.
+const ENGINE = options.engine === "release" ? await fetchEngine() : options.engine === undefined ? undefined : resolve(options.engine);
+// Without --source: the installed Arc while it's still 1.168.0, else the copy in bin/.
+const SOURCE = Bun.argv.includes("--source") ? options.source : defaultArcSource();
 const { appName, bundleId: MOD_BUNDLE_ID } = session;
-const OUT = join(root, `build/${appName}.app`);
+// Built into a staging bundle and swapped in at the end, so a failed build leaves the previous app in place.
+const FINAL = finalApp(appName);
+const OUT = stagedApp(appName);
 const DYLIB_INSTALL = "@executable_path/../Frameworks/ArcMod.dylib";
 
 const sh = (cmd: readonly string[], opts: { quiet?: boolean } = {}): string => {
@@ -53,16 +65,12 @@ const depth = (p: string): number => p.split("/").length;
 
 // ---------------------------------------------------------------------------------------------
 
+// A staged build (--stage-only) can be made while the app runs; replacing the app can't.
 const assertOutputStopped = (): void => {
-  const processes = sh(["ps", "-axo", "pid=,command="]);
-  const executable = join(OUT, "Contents/MacOS/Arc");
-  const running = processes.split("\n").filter((line) => {
-    const command = line.trim().replace(/^\d+\s+/, "");
-    return command === executable || command.startsWith(`${executable} `);
-  });
+  const running = runningApp(appName);
   if (running.length > 0) throw new Error(`refusing to overwrite running ${appName}: ${running.map((line) => line.trim()).join(", ")}`);
 };
-assertOutputStopped();
+if (!options.stageOnly) assertOutputStopped();
 if (!existsSync(SOURCE)) throw new Error(`source app not found: ${SOURCE}`);
 const version = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBundleShortVersionString"]).trim();
 const build = sh(["defaults", "read", join(SOURCE, "Contents/Info.plist"), "CFBundleVersion"]).trim();
@@ -79,13 +87,12 @@ const dylib = join(root, "build/ArcMod.dylib");
 step("compile mods/hello/ArcMod.m → build/ArcMod.dylib");
 sh([
   "clang", "-dynamiclib", "-arch", "arm64", "-fobjc-arc", "-Wall", "-Wextra", "-Werror", "-mmacosx-version-min=13.0",
-  "-framework", "AppKit", "-I", join(root, "build"), "-install_name", DYLIB_INSTALL, "-o", dylib,
+  "-framework", "AppKit", "-framework", "CoreServices", "-I", join(root, "build"), "-install_name", DYLIB_INSTALL, "-o", dylib,
   join(root, "mods/hello/ArcMod.m"), join(root, "mods/local/ServicePolicy.m"),
   join(root, "mods/local/ShortcutPolicy.m"),
 ]);
 
-step(`APFS-clone app → build/${appName}.app`);
-assertOutputStopped();
+step(`APFS-clone app → ${relative(root, OUT)}`);
 rmSync(OUT, { recursive: true, force: true });
 sh(["cp", "-cR", SOURCE, OUT]);
 if (ENGINE !== undefined) {
@@ -118,6 +125,32 @@ plutil("-insert", "ArcModHostResolverRules", "-string", hostResolverRules);
 plutil("-replace", "SUEnableAutomaticChecks", "-bool", "NO");
 plutil("-replace", "SUAutomaticallyUpdate", "-bool", "NO");
 plutil("-replace", "SUFeedURL", "-string", "https://127.0.0.1:9/arcmod-updates-disabled.xml");
+// Arc's Dock tile plug-in shows the chosen icon while Arc isn't running, without ArcMod's badge, and Arc
+// tells it about changes by a notification name the real Arc's plug-in also receives. ArcMod's dylib
+// badges the bundle's own custom icon instead, which the Dock uses once the plug-in is gone.
+plutil("-remove", "NSDockTilePlugIn");
+// The shown name is the localized CFBundleName (ArcMod menu → Rename App…). Arc names its data folder after
+// the unlocalized CFBundleName, so renaming never moves the data. Only the normal ArcMod can be renamed.
+plutil("-insert", "LSHasLocalizedDisplayName", "-bool", "YES");
+// Read by tools/update.ts and ArcMod's update check: the release this build came from, its engine and its source.
+const describe = Bun.spawnSync(["git", "-C", root, "describe", "--tags", "--always", "--dirty", ...describeArgs(currentChannel())]).stdout.toString().trim();
+plutil("-insert", "ArcModVersion", "-string", describe || "unknown");
+plutil("-insert", "ArcModBuildEngine", "-string", options.engine === "release" ? "release" : ENGINE ?? "arc");
+plutil("-insert", "ArcModRepository", "-string", root);
+const shownName = session.agent === undefined && MOD_BUNDLE_ID === "company.thebrowser.Browser.mod"
+  ? Bun.spawnSync(["defaults", "read", MOD_BUNDLE_ID, "ArcModAppName"]).stdout.toString().trim()
+  : "";
+if (shownName) {
+  step(`shown name: ${shownName}`);
+  const resources = join(OUT, "Contents/Resources");
+  const folders = new Set(["en.lproj", ...readdirSync(resources).filter((name) => name.endsWith(".lproj"))]);
+  folders.forEach((folder) => {
+    mkdirSync(join(resources, folder), { recursive: true });
+    const strings = join(resources, folder, "InfoPlist.strings");
+    writeFileSync(strings, JSON.stringify({ CFBundleName: shownName, CFBundleDisplayName: shownName }));
+    sh(["plutil", "-convert", "xml1", strings]);
+  });
+}
 rmSync(join(OUT, "Contents/embedded.provisionprofile"), { force: true });
 
 step("main executable: thin to arm64, strip signature, apply local patches, insert required dylib");
@@ -151,4 +184,10 @@ step("verify");
 sh(["codesign", "--verify", "--deep", "--strict", OUT], { quiet: true });
 const loads = sh(["otool", "-L", exe]).split("\n").filter((l) => l.includes("ArcMod"));
 console.log(`  codesign --verify --deep --strict: ok\n  ${loads.join("\n  ").trim()}`);
-console.log(`\nbuilt ${relative(root, OUT)} from Arc ${version}`);
+if (options.stageOnly) {
+  console.log(`\nstaged ${relative(root, OUT)} from Arc ${version}`);
+} else {
+  assertOutputStopped();
+  swapInStagedApp(appName);
+  console.log(`\nbuilt ${relative(root, FINAL)} from Arc ${version}`);
+}

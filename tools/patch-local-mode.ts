@@ -7,6 +7,7 @@ import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortcutBridge, shortcutBridgeOffset } from "./shortcut-bridge";
 import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
+import { finalApp, stagedApp } from "./build-paths";
 
 type Patch = { readonly address: bigint; readonly original: Buffer; readonly replacement: Buffer };
 const onboarding = Buffer.from("f44fbea9fd7b01a9fd430091f40300aaf30308aadbf7fc9700010036000080d23125fd97081480b9886a68381f010071e8079f1a020000142800805268020039fd7b41a9f44fc2a8c0035fd6", "hex");
@@ -81,6 +82,13 @@ localCloseUserPresence.writeUInt32LE(branch(0x102a3ade8n, 0x100000000n + BigInt(
 const savedWindowRestore = Buffer.from("f40300aab50640f9e00319aae1031baaa0023fd6b40f0036752600f97c3200f9", "hex");
 const localSavedWindowRestore = Buffer.from(savedWindowRestore);
 localSavedWindowRestore.set(Buffer.from("1f2003d5", "hex"), 20);
+// App icons: with no account (User.createdAt is nil) the availability check returns
+// notAvailable for every icon but Original, and the Icon pane drops those. On that
+// path only, return availableByDefault (0) instead of `icon != original`. The
+// temporary Optional<Date> is already destroyed; signed-in rules are unchanged.
+const appIconAvailability = Buffer.from("1f040071c1010054e0031caa850000943f1f0072e0079f1a21008052", "hex");
+const localAppIconAvailability = Buffer.from(appIconAvailability);
+localAppIconAvailability.set(Buffer.from("00008052", "hex"), 20); // mov w0, #0 (was cset w0, ne)
 const patches: readonly Patch[] = [
   { address: 0x10186b3b0n, original: onboarding, replacement: localOnboarding },
   { address: windowAddress, original: Buffer.from("000080d2678f8697f40300aa08805ff8081940f9e00316aa21008052e20314aa00013fd61f04007101070054", "hex"), replacement: localWindow },
@@ -95,6 +103,7 @@ const patches: readonly Patch[] = [
   { address: 0x102a3add4n, original: closeUserPresence, replacement: localCloseUserPresence },
   { address: 0x100000000n + BigInt(localCloseBridgeOffset), original: Buffer.alloc(localCloseBridge.length), replacement: localCloseBridge },
   { address: 0x102ab2f34n, original: savedWindowRestore, replacement: localSavedWindowRestore },
+  { address: 0x101eee7dcn, original: appIconAvailability, replacement: localAppIconAvailability },
 ];
 
 export const patchLocalMode = (source: Buffer): Buffer => {
@@ -136,9 +145,11 @@ export const patchLocalMode = (source: Buffer): Buffer => {
 
 if (import.meta.main) {
   const file = Bun.argv[2];
-  const allowed = ["ArcMod", "ArcModValidation"].map((name) => join(import.meta.dir, `../build/${name}.app/Contents/MacOS/Arc`));
-  const candidate = file?.match(/\/ArcModAgent-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\.app\/Contents\/MacOS\/Arc$/)?.[1];
-  if (candidate && candidate.length <= 32) allowed.push(join(import.meta.dir, `../build/ArcModAgent-${candidate}.app/Contents/MacOS/Arc`));
+  // ArcMod builds and their staging copies (tools/build-paths.ts), never another app.
+  const names = ["ArcMod", "ArcModValidation"];
+  const candidate = file?.match(/\/\.?ArcModAgent-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?:\.staging)?\.app\/Contents\/MacOS\/Arc$/)?.[1];
+  if (candidate && candidate.length <= 32) names.push(`ArcModAgent-${candidate}`);
+  const allowed = names.flatMap((name) => [finalApp(name), stagedApp(name)].map((app) => join(app, "Contents/MacOS/Arc")));
   if (!file || !allowed.some((path) => realpathSync(file) === join(path))) throw new Error("patch only an ArcMod build executable");
   writeFileSync(file, patchLocalMode(readFileSync(file)));
   console.log("local mode: onboarding disabled, local windows and single Little Arc enabled; performance: compact state JSON, LaunchDarkly offline; account state unchanged");

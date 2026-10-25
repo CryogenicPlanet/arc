@@ -4,6 +4,7 @@ import { isDeepStrictEqual } from "node:util";
 import policy from "../resources/local-shortcut-policy.json";
 import routing from "../resources/shortcut-menu-routing.json";
 import snapshot from "../resources/shortcut-menu-inventory.json";
+import { defaultArcSource } from "./arc-source";
 import { inventoryFromArc, type MenuEntry } from "./shortcut-inventory";
 import { verifyGeneratedShortcutCoverage } from "./shortcut-generated-coverage";
 
@@ -52,7 +53,7 @@ export function auditShortcutCoverage(entries: readonly MenuEntry[], value: Poli
   });
 }
 
-export function verifyShippedShortcutCoverage(source = "/Applications/Arc.app") {
+export function verifyShippedShortcutCoverage(source = defaultArcSource()) {
   const actual = inventoryFromArc(source);
   if (actual.sourceSha256 !== snapshot.sourceSha256 || !isDeepStrictEqual(actual.entries, snapshot.entries)) {
     throw new Error("Arc menu inventory drift: regenerate and review every action before building");

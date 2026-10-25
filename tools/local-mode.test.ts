@@ -17,8 +17,8 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(Bun.hash(original)).toBe(originalDigest);
     const changed: number[] = [];
     original.forEach((byte, i) => { if (byte !== patched[i]) changed.push(i); });
-    expect(changed.length).toBe(226);
-    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4))).toBe(true);
+    expect(changed.length).toBe(230);
+    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4) || (i >= 0x1eee7f0 && i < 0x1eee7f4))).toBe(true);
     // The new call must destroy the optional session, and the branch must reach local bootstrap.
     const target = (offset: number): number => {
       const immediate = patched.readUInt32LE(offset) & 0x3ffffff;
@@ -50,6 +50,13 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(patched.subarray(0x16f1c0, 0x16f324)).toEqual(original.subarray(0x16f1c0, 0x16f324));
     expect(localCloseBridge.readUInt32LE(0)).toBe(0xb4000041);
     expect(localCloseBridgeOffset + localCloseBridge.length).toBeLessThanOrEqual(0x3138);
+  });
+
+  test("app icons are available without an account; the signed-in availability rules are unchanged", () => {
+    expect(patched.readUInt32LE(0x1eee7f0)).toBe(0x52800000);
+    expect(original.readUInt32LE(0x1eee7f0)).toBe(0x1a9f07e0);
+    expect(patched.subarray(0x1eee6d4, 0x1eee7f0)).toEqual(original.subarray(0x1eee6d4, 0x1eee7f0));
+    expect(patched.subarray(0x1eee7f4, 0x1eee9ac)).toEqual(original.subarray(0x1eee7f4, 0x1eee9ac));
   });
 
   test("local saved-window restore preserves state destruction and native saved-data checks", () => {

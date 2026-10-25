@@ -29,7 +29,8 @@ export const sessionIdentity = (validation = false, agent?: string): SessionIden
   return {
     appName: validation ? "ArcModValidation" : "ArcMod",
     bundleId: validation ? "company.thebrowser.Browser.mod.validation" : "company.thebrowser.Browser.mod",
-    displayName: validation ? "Arc Mod Test" : "Arc Mod",
+    // macOS shows a localized name (ArcMod menu → Rename App…) only when this matches the bundle's folder name.
+    displayName: validation ? "Arc Mod Test" : "ArcMod",
     agent: undefined,
   };
 };
@@ -39,6 +40,8 @@ export interface BuildOptions {
   readonly session: SessionIdentity;
   // An ArcCore.framework to use instead of the source app's own engine (e.g. one built from Chromium).
   readonly engine?: string;
+  // Leave the build staged (tools/build-paths.ts) instead of replacing the app; tools/update.ts swaps it later.
+  readonly stageOnly?: true;
 }
 
 export const parseBuildOptions = (args: readonly string[]): BuildOptions => {
@@ -46,14 +49,16 @@ export const parseBuildOptions = (args: readonly string[]): BuildOptions => {
   let validation = false;
   let agent: string | undefined;
   let engine: string | undefined;
+  let stageOnly = false;
   const seen = new Set<string>();
   for (let index = 0; index < args.length; index++) {
     const flag = args[index]!;
-    if (!["--source", "--validation", "--agent", "--engine"].includes(flag)) throw new Error(`unrecognized build argument: ${flag}`);
+    if (!["--source", "--validation", "--agent", "--engine", "--stage-only"].includes(flag)) throw new Error(`unrecognized build argument: ${flag}`);
     if (seen.has(flag)) throw new Error(`duplicate build argument: ${flag}`);
     seen.add(flag);
-    if (flag === "--validation") {
-      validation = true;
+    if (flag === "--validation" || flag === "--stage-only") {
+      if (flag === "--validation") validation = true;
+      else stageOnly = true;
       continue;
     }
     const value = args[++index];
@@ -63,5 +68,5 @@ export const parseBuildOptions = (args: readonly string[]): BuildOptions => {
     else agent = validateAgentSlug(value);
   }
   const session = sessionIdentity(validation, agent);
-  return engine === undefined ? { source, session } : { source, session, engine };
+  return { source, session, ...(engine === undefined ? {} : { engine }), ...(stageOnly ? { stageOnly: true as const } : {}) };
 };

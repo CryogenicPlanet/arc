@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { defaultArcSource } from "./arc-source";
 
 type Primitive = string | number | boolean | null;
 type Ref = { ref: number };
@@ -196,7 +197,7 @@ export function parseNibMenu(buffer: Buffer): MenuEntry[] {
   return [...entries.values()].sort((a, b) => a.nibId - b.nibId);
 }
 
-export function inventoryFromArc(path = "/Applications/Arc.app"): ShortcutInventory {
+export function inventoryFromArc(path = defaultArcSource()): ShortcutInventory {
   const plist = join(path, "Contents/Info.plist");
   const read = (key: string): string => {
     const result = Bun.spawnSync(["/usr/bin/plutil", "-extract", key, "raw", "-o", "-", plist], { stdout: "pipe", stderr: "pipe" });
@@ -212,7 +213,7 @@ export function inventoryFromArc(path = "/Applications/Arc.app"): ShortcutInvent
 }
 
 if (import.meta.main) {
-  let source = "/Applications/Arc.app", write: string | undefined;
+  let source: string | undefined, write: string | undefined;
   const args = process.argv.slice(2);
   while (args.length) {
     const flag = args.shift(), value = args.shift();
@@ -220,6 +221,6 @@ if (import.meta.main) {
     if (flag === "--source") source = value; else write = value;
   }
   // Validate the entire archive and bundle before opening any output file.
-  const output = JSON.stringify(inventoryFromArc(source), null, 2) + "\n";
+  const output = JSON.stringify(inventoryFromArc(source ?? defaultArcSource()), null, 2) + "\n";
   if (write) writeFileSync(write, output); else process.stdout.write(output);
 }
