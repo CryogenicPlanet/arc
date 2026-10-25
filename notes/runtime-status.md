@@ -1,7 +1,15 @@
-# ArcMod runtime checkpoint — 2026-10-13
+# ArcMod runtime status (`no-login`)
 
-Target: Arc 1.168.0 (88413), arm64. The initial Git commit records this checkpoint,
-including known failures. It is not a known-good shortcut baseline.
+Target: Arc 1.168.0 (88413), arm64. Most of this was verified on 2026-10-13; later
+changes are listed first. It is not a known-good shortcut baseline.
+
+## Since 2026-10-13
+
+- `tools/import-arc-data.ts` copies a stock Arc profile's cookies, site storage,
+  extensions, history and permissions into ArcMod (2026-10-22).
+- `bun tools/build-mod.ts --engine <ArcCore.framework>` builds ArcMod on another engine,
+  such as [Arc Engine](https://github.com/CryogenicPlanet/arc-engine), our engine built
+  from Chromium (2026-10-23). Its status is in that repo's README and `NEXT.md`.
 
 ## Implemented and checked
 

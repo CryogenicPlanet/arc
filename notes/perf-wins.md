@@ -108,7 +108,7 @@ launch profile of `build/ArcMod.app` before and after.
 - `BrowserApp` / `InstrumentedBrowserApp` event entry points are pass-through; no per-event cost to remove.
 - `ARCUI.HoverRegionTracker` only notifies its delegate on region-state changes (per-region
   `HoverRecord` with `lastUpdateToken`), not on every mouse move. The sidebar-hover→root-state concern
-  from `perf-levers.md` is still plausible (`WindowHoverTracker` sends `WindowAction`s into the window
+  from the earlier static survey is still plausible (`WindowHoverTracker` sends `WindowAction`s into the window
   store) but needs an interaction profile to quantify.
 - Save/encode is already off the main thread (see above).
 
