@@ -37,8 +37,9 @@
   browser data, credentials, app bundles or profiling captures. The 1.168.0
   decompile, dumps, executable and app bundle are tracked with Git LFS; the Ghidra
   project stays local.
-- When you find or fix a problem, update the status issue's list of known problems
-  (`gh issue edit 1 -R CryogenicPlanet/arc --body-file <file>`, keeping its layout and the
-  "Updated" date); don't keep separate status lists in docs. Record findings, evidence and
+- Track problems in the status issue (`gh issue edit 1 -R CryogenicPlanet/arc --body-file <file>`,
+  keeping its layout and the "Updated" date): add new ones; when you fix one, tick it and strike
+  it through with the fixing commits so it stays as history. Comment only for big updates, and
+  don't keep separate status lists in docs. Record findings, evidence and
   validation limits in `notes/`. Passing binary tests
   does not prove every shortcut works; separate source checks from live results.
