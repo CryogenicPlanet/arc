@@ -42,14 +42,17 @@ describe("agent build identity", () => {
 });
 
 // Real Bash/PlistBuddy parsing, with every launch/prefs/data mutation replaced by a recording stub.
-const launch = (args: readonly string[], options: { readonly running?: string; readonly plistAgent?: string } = {}) => {
+const launch = (args: readonly string[], options: { readonly running?: string; readonly plistAgent?: string; readonly installed?: boolean } = {}) => {
   const root = mkdtempSync(join(tmpdir(), "arc-agent-launch-"));
   try {
     mkdirSync(join(root, "tools"));
     mkdirSync(join(root, "stubs"));
     copyFileSync(join(import.meta.dir, "run-mod.sh"), join(root, "tools/run-mod.sh"));
-    for (const [name, agent] of [["ArcMod", ""], ["ArcModValidation", ""], ["ArcModAgent-scout", options.plistAgent ?? "scout"]]) {
-      const contents = join(root, `build/${name}.app/Contents`);
+    const bundles: [string, string, string][] = [["build/ArcMod.app", "ArcMod", ""], ["build/ArcModValidation.app", "ArcModValidation", ""],
+      ["build/ArcModAgent-scout.app", "ArcModAgent-scout", options.plistAgent ?? "scout"]];
+    if (options.installed) bundles.push(["Applications/ArcMod.app", "ArcMod", ""]);
+    for (const [path, , agent] of bundles) {
+      const contents = join(root, `${path}/Contents`);
       mkdirSync(join(contents, "MacOS"), { recursive: true });
       writeFileSync(join(contents, "MacOS/Arc"), "#!/bin/sh\nexit 99\n");
       chmodSync(join(contents, "MacOS/Arc"), 0o755);
@@ -60,7 +63,7 @@ const launch = (args: readonly string[], options: { readonly running?: string; r
       writeFileSync(path, `#!/bin/bash\nprintf '%s\\0' "$@" >> "$ARC_TEST_TRACE/${command}"\n${command === "pgrep" ? 'if [[ -n "$ARC_TEST_RUNNING" ]]; then echo "$ARC_TEST_RUNNING"; else exit 1; fi' : "exit 0"}\n`);
       chmodSync(path, 0o755);
     }
-    const result = Bun.spawnSync(["/bin/bash", join(root, "tools/run-mod.sh"), ...args], { env: { ...process.env, PATH: `${root}/stubs:/usr/bin:/bin`, ARC_TEST_TRACE: root, ARC_TEST_RUNNING: options.running ?? "" }, stdout: "pipe", stderr: "pipe" });
+    const result = Bun.spawnSync(["/bin/bash", join(root, "tools/run-mod.sh"), ...args], { env: { ...process.env, PATH: `${root}/stubs:/usr/bin:/bin`, ARC_TEST_TRACE: root, ARC_TEST_RUNNING: options.running ?? "", ARCMOD_INSTALL_DIRS: join(root, "Applications") }, stdout: "pipe", stderr: "pipe" });
     const recorded = (command: string): string[] => existsSync(join(root, command)) ? readFileSync(join(root, command), "utf8").split("\0").slice(0, -1) : [];
     return { success: result.success, stderr: result.stderr.toString(), stdout: result.stdout.toString(), open: recorded("open"), defaults: recorded("defaults"), mkdir: recorded("mkdir"), pgrep: recorded("pgrep"), root };
   } finally {
@@ -69,9 +72,17 @@ const launch = (args: readonly string[], options: { readonly running?: string; r
 };
 
 describe("launcher argument semantics", () => {
+  test("the default launch opens the installed ArcMod; --debug opens the build in build/", () => {
+    const installed = launch([], { installed: true });
+    expect(installed.success).toBe(true);
+    expect(installed.open).toContain(`${installed.root}/Applications/ArcMod.app`);
+    const debug = launch(["--debug"], { installed: true });
+    expect(debug.success).toBe(true);
+    expect(debug.open).toContain(`${debug.root}/build/ArcMod.app`);
+  });
+
   test("default and validation launches preserve their isolation", () => {
-    // --debug: the everyday ArcMod may also be installed in Applications, which run-mod.sh prefers otherwise.
-    for (const [args, name, domain] of [[["--debug"], "ArcMod", "company.thebrowser.Browser.mod"], [["--validation"], "ArcModValidation", "company.thebrowser.Browser.mod.validation"]] as const) {
+    for (const [args, name, domain] of [[[], "ArcMod", "company.thebrowser.Browser.mod"], [["--validation"], "ArcModValidation", "company.thebrowser.Browser.mod.validation"]] as const) {
       const result = launch(args);
       expect(result.success).toBe(true);
       expect(result.open).toContain(`${result.root}/build/${name}.app`);

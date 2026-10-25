@@ -74,8 +74,10 @@ if [[ -n "$APP_PATH" ]]; then
   [[ "$APP_NAME" == ArcMod || "$APP_NAME" == ArcModValidation ]] || fail "not an ArcMod app: $APP"
   [[ "$APP_NAME" == ArcMod ]] || { DOMAIN=company.thebrowser.Browser.mod.validation; VALIDATION=1; }
 elif [[ "$APP_NAME" == ArcMod && $DEBUG == 0 ]]; then
-  for INSTALLED in /Applications/ArcMod.app "$HOME/Applications/ArcMod.app"; do
-    if [[ -d "$INSTALLED" ]]; then APP="$INSTALLED"; break; fi
+  # Where bun tools/build-mod.ts installs it (ARCMOD_INSTALL_DIRS overrides the list for tests).
+  IFS=: read -r -a INSTALL_DIRS <<< "${ARCMOD_INSTALL_DIRS:-/Applications:$HOME/Applications}"
+  for DIR in "${INSTALL_DIRS[@]}"; do
+    if [[ -d "$DIR/ArcMod.app" ]]; then APP="$DIR/ArcMod.app"; break; fi
   done
 fi
 EXE="$APP/Contents/MacOS/Arc"
