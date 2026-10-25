@@ -29,7 +29,11 @@
 ## Build and verification
 
 - Quit ArcMod before `bun tools/build-mod.ts`; the builder replaces its app bundle.
-- Launch with `tools/run-mod.sh`. Use **ArcMod** for routine testing.
+- The everyday ArcMod is the user's own browser, installed at `/Applications/ArcMod.app`; don't
+  rebuild or relaunch it without asking. Test with `--validation` builds (or agent builds on
+  `master`); `bun tools/build-mod.ts --debug` and `tools/run-mod.sh --debug` keep a build in
+  `build/` instead. When launching a build by hand, pass `--use-mock-keychain` (or use
+  `tools/run-mod.sh`) so a failed in-app switch hook can't make macOS ask for "Arc Safe Storage".
 - For code changes, run `bun run typecheck`, `bun run lint`, and `bun run test`.
   Ensure `bin/Arc.arm64` exists so binary tests do not silently skip; see README.
 - Native patches also need a rebuilt, signed app and relevant live behavior checks.

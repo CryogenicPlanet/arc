@@ -26,19 +26,19 @@ git lfs install
 git clone -b no-login https://github.com/CryogenicPlanet/arc.git
 cd arc
 bun install
-bun tools/build-mod.ts   # builds build/ArcMod.app
-tools/run-mod.sh         # launches ArcMod
+bun tools/build-mod.ts   # builds ArcMod and puts it in /Applications
+open -a ArcMod
 ```
 
-That's it. The build takes about a minute the first time and a few seconds after that.
+That's it. From now on, open ArcMod like any other app. The build takes about a minute the
+first time and a few seconds after that.
 
 What just happened? ArcMod only builds from Arc **1.168.0**, and the repo includes a copy of it
 in `bin/`. The builder uses `/Applications/Arc.app` while it's still 1.168.0; otherwise it
-unpacks the included copy into `build/source/` once. Then it patches a copy of that app and
-signs it on your Mac.
+unpacks the included copy into `build/source/` once. Then it patches a copy of that app, signs
+it on your Mac and installs it as `/Applications/ArcMod.app` (`~/Applications` if you can't write
+to `/Applications`).
 
-- Always start ArcMod with `tools/run-mod.sh`. It applies the service blocking that Chromium
-  needs at launch.
 - Quit ArcMod before you rebuild.
 - The clone downloads about 730 MB through Git LFS: about 380 MB of Arc in `bin/` and about
   350 MB of reverse-engineering files. To skip the latter, clone with
@@ -72,18 +72,25 @@ You're on `no-login`. The rest of this README covers only what this branch inclu
   shortcuts and Settings work without an account. No fake account or token is created; Arc's
   own account checks are left in place.
 - **Blocks The Browser Company's services.** Requests from Arc's native code to its backend,
-  sync, LaunchDarkly, Sentry, Segment and Datadog fail locally. Websites that use Firebase or
-  similar services keep working.
+  sync, LaunchDarkly, Sentry, Segment and Datadog fail locally.
 - **Separate data.** ArcMod keeps everything in `~/Library/Application Support/ArcMod`.
 
 ## What you give up
+
+We're working on bringing back what we can.
 
 - Arc account features: sync across devices, Arc Max AI features, and calendar and email
   previews.
 - iCloud, push notifications, and passkeys stored in iCloud Keychain or with Touch ID (see
   [Passkeys](#passkeys)). The copy is re-signed on your Mac, and Apple ties those features to
   Arc's original signature.
-- Arc's own updates. ArcMod stays on Arc 1.168.0 and updates only from this repo.
+- Arc's own updates. ArcMod stays on Arc 1.168.0's app and updates only from this repo.
+
+> **Security updates.** By default ArcMod runs on Arc's own engine, which stops getting Chromium
+> security fixes when Arc shuts down on 2026-12-22. [Arc Engine](#arc-engine-experimental) is how
+> ArcMod keeps getting them: each Chromium security release becomes a new Arc Engine build, an
+> ArcMod release pins it, and updating ArcMod picks it up. Until Arc Engine is ready for daily
+> use, it's something you opt into.
 
 ## Bring your logins over
 
@@ -162,7 +169,7 @@ To try it, build a separate test copy of ArcMod on the prebuilt engine:
 
 ```sh
 bun tools/build-mod.ts --validation --engine release   # downloads about 160 MB once
-tools/run-mod.sh --validation
+open build/ArcModValidation.app
 ```
 
 `--engine release` downloads the engine release this commit pins
@@ -181,6 +188,9 @@ bun run typecheck
 bun run lint
 bun run test
 ```
+
+`bun tools/build-mod.ts --debug` keeps ArcMod in `build/ArcMod.app` instead of installing it;
+launch that one with `tools/run-mod.sh --debug`.
 
 Binary tests run against `bin/Arc.arm64`, the original Arc 1.168.0 executable, stored in Git
 LFS because Arc's auto-update replaces the installed copy. They skip when the file is missing.
