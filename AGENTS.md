@@ -31,8 +31,10 @@
 - The everyday ArcMod is the user's own browser, installed at `/Applications/ArcMod.app`; don't
   rebuild or relaunch it without asking. Test with `--validation` builds (or agent builds on
   `master`); `bun tools/build-mod.ts --debug` and `tools/run-mod.sh --debug` keep a build in
-  `build/` instead. When launching a build by hand, pass `--use-mock-keychain` (or use
-  `tools/run-mod.sh`) so a failed in-app switch hook can't make macOS ask for "Arc Safe Storage".
+  `build/` instead. The everyday ArcMod uses the Keychain's "Arc Safe Storage" item, like Arc.
+  Validation and agent builds run with `--use-mock-keychain` (Chromium's fixed, public test key;
+  ArcMod.dylib and `tools/run-mod.sh` add it), so never put real sessions in them: no imports, no
+  copies of a real profile, no signing in.
 - For code changes, run `bun run typecheck`, `bun run lint`, and `bun run test`.
   Ensure `bin/Arc.arm64` exists so binary tests do not silently skip; see README.
 - Native patches also need a rebuilt, signed app and relevant live behavior checks.

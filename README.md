@@ -41,6 +41,14 @@ it on your Mac and installs it as `/Applications/ArcMod.app` (`~/Applications` i
 to `/Applications`).
 
 - Quit ArcMod before you rebuild.
+- ArcMod keeps your cookies and saved passwords under the Keychain item Arc uses, "Arc Safe
+  Storage". The first time a new build opens, macOS asks to let ArcMod use it: enter your login
+  password and choose **Always Allow**. Each build is signed on your Mac, so macOS asks again
+  after you rebuild or update.
+- ArcMod builds from before October 25, 2026 used Chromium's fixed test key instead. The first
+  time a newer build opens on that data, it opens Terminal and moves your saved cookies and
+  passwords to the Keychain (`bun tools/keychain-profile.ts`; macOS asks to let `security` read
+  "Arc Safe Storage"), then reopens.
 - The clone downloads about 730 MB through Git LFS: about 380 MB of Arc in `bin/` and about
   350 MB of reverse-engineering files. To skip the latter, clone with
   `GIT_LFS_SKIP_SMUDGE=1`, then run `git lfs pull --include="bin/*"`.
@@ -129,11 +137,10 @@ This copies cookies, site storage, extensions, history and permissions. Sidebar 
 account data aren't copied. To run it from a terminal instead, quit both browsers, then run
 `bun tools/import-arc-data.ts`.
 
-- macOS asks to read "Arc Safe Storage". Choose **Allow**, not "Always Allow".
-- Your Arc data is only read. ArcMod's previous profile is kept as
-  `Default.pre-import-<timestamp>`.
-- ArcMod uses Chromium's mock keychain, so imported logins are protected only by a public key.
-  Don't import on a shared Mac.
+- Your Arc data is only read, and nothing is decrypted: ArcMod uses Arc's own Keychain item, so
+  the copy works as it is. ArcMod's previous profile is kept as `Default.pre-import-<timestamp>`.
+- Test (`--validation`) and agent builds keep their data under Chromium's fixed test key, so
+  importing into them isn't offered. Don't sign in to real accounts in them.
 
 ## Agent browser tools
 
@@ -215,7 +222,9 @@ open build/ArcModValidation.app
 `--engine release` downloads the engine release this commit pins
 (`resources/engine-release.json`), checks its SHA-256 and swaps it in for Arc's engine. The
 test copy, ArcModValidation, keeps its own data. Keep it that way for now: Arc's engine for
-1.168.0 is Chromium 155, and opening a profile with Chromium 156 upgrades it for good.
+1.168.0 is Chromium 155, and opening a profile with Chromium 156 upgrades it for good. The
+everyday ArcMod also refuses an engine that keeps its keys under "Chromium Safe Storage" instead
+of Arc's item, which includes the v0.1.0 release.
 
 To build the engine yourself, see
 [Arc Engine's README](https://github.com/CryogenicPlanet/arc-engine#build-it), then pass its

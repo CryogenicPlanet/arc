@@ -10,7 +10,7 @@
 //   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation | --agent <slug>]
 //                          [--engine <ArcCore.framework> | --engine release]   (Arc Engine; see README)
 
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { homedir } from "node:os";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
@@ -106,6 +106,12 @@ if (ENGINE !== undefined) {
   if (installName !== "@executable_path/../Frameworks/ArcCore.framework/Versions/A/ArcCore") {
     throw new Error(`engine install name is ${installName}, expected Arc's ArcCore path`);
   }
+  // The everyday ArcMod keeps its keys in the Keychain item "Arc Safe Storage", like Arc's engine. An engine
+  // that uses Chromium's own item couldn't read that profile.
+  if (MOD_BUNDLE_ID === "company.thebrowser.Browser.mod" && readFileSync(engineBinary).includes("Chromium Safe Storage")) {
+    throw new Error(`this engine keeps keys under "Chromium Safe Storage", so the everyday ArcMod couldn't read its profile; `
+      + "use Arc's engine or an Arc Engine build from eabe48ea on (`./package-engine.sh`)");
+  }
   step(`engine → ${ENGINE}`);
   const frameworks = join(OUT, "Contents/Frameworks/ArcCore.framework");
   rmSync(frameworks, { recursive: true, force: true });
@@ -139,6 +145,8 @@ const describe = Bun.spawnSync(["git", "-C", root, "describe", "--tags", "--alwa
 plutil("-insert", "ArcModVersion", "-string", describe || "unknown");
 plutil("-insert", "ArcModBuildEngine", "-string", options.engine === "release" ? "release" : ENGINE ?? "arc");
 plutil("-insert", "ArcModRepository", "-string", root);
+// The everyday ArcMod uses the Keychain, not Chromium's test key (tools/keychain-profile.ts checks for this).
+if (MOD_BUNDLE_ID === "company.thebrowser.Browser.mod") plutil("-insert", "ArcModKeychain", "-bool", "YES");
 const shownName = session.agent === undefined && MOD_BUNDLE_ID === "company.thebrowser.Browser.mod"
   ? Bun.spawnSync(["defaults", "read", MOD_BUNDLE_ID, "ArcModAppName"]).stdout.toString().trim()
   : "";
