@@ -2,13 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { compareVersions, parseVersion } from "./update";
 
 describe("release tags", () => {
-  test("each branch only accepts its own tags", () => {
-    expect(parseVersion("v0.1.0", "master")).toEqual([0, 1, 0]);
-    expect(parseVersion("v0.1.0-no-login", "master")).toBeUndefined();
-    expect(parseVersion("v0.1.0-no-login", "no-login")).toEqual([0, 1, 0]);
-    expect(parseVersion("v0.1.0", "no-login")).toBeUndefined();
-    expect(parseVersion("v0.1", "master")).toBeUndefined();
-    expect(parseVersion("v0.1.0-rc1", "master")).toBeUndefined();
+  test("only vX.Y.Z tags are releases", () => {
+    expect(parseVersion("v0.1.0")).toEqual([0, 1, 0]);
+    expect(parseVersion("v0.1.0-no-login")).toBeUndefined();
+    expect(parseVersion("v0.1")).toBeUndefined();
+    expect(parseVersion("v0.1.0-rc1")).toBeUndefined();
   });
 
   test("versions compare numerically, not as text", () => {

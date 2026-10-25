@@ -18,7 +18,7 @@ import { shortcutPolicyHeader } from "./shortcut-policy";
 import { defaultArcSource } from "./arc-source";
 import { fetchEngine } from "./fetch-engine";
 import { finalApp, installedApp, runningAt, stagedApp, swapInStagedApp } from "./build-paths";
-import { currentChannel, describeArgs } from "./update";
+import { describeArgs } from "./update";
 import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 import { parseBuildOptions } from "./agent-session";
 import { acquireLease } from "./agent-lease";
@@ -135,7 +135,7 @@ plutil("-remove", "NSDockTilePlugIn");
 // the unlocalized CFBundleName, so renaming never moves the data. Only the normal ArcMod can be renamed.
 plutil("-insert", "LSHasLocalizedDisplayName", "-bool", "YES");
 // Read by tools/update.ts and ArcMod's update check: the release this build came from, its engine and its source.
-const describe = Bun.spawnSync(["git", "-C", root, "describe", "--tags", "--always", "--dirty", ...describeArgs(currentChannel())]).stdout.toString().trim();
+const describe = Bun.spawnSync(["git", "-C", root, "describe", "--tags", "--always", "--dirty", ...describeArgs]).stdout.toString().trim();
 plutil("-insert", "ArcModVersion", "-string", describe || "unknown");
 plutil("-insert", "ArcModBuildEngine", "-string", options.engine === "release" ? "release" : ENGINE ?? "arc");
 plutil("-insert", "ArcModRepository", "-string", root);

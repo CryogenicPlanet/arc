@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { acquireLease, type Lease } from "./agent-lease";
-import { sessionIdentity } from "./agent-session";
+import { agentToolsEnabled, sessionIdentity } from "./agent-session";
 import { AgentCDP, verifyAgentEndpoint } from "./agent-cdp";
 import { NativeController } from "./agent-native";
 import { AgentBrowser, BrowserError } from "./agent-browser";
@@ -32,6 +32,7 @@ export class AgentRuntime {
     try { return await work; } finally { this.opening.delete(work); }
   }
   private async openOwned(agent?: string, requestedPort?: number, attach = false): Promise<Record<string, unknown>> {
+    if (!agentToolsEnabled()) throw new BrowserError("agent_tools_off", "Agent browser tools are turned off in ArcMod", "Turn on Settings → ArcMod → Agent browser tools.");
     if (this.sessions.size + this.opening.size >= 8) throw new BrowserError("session_limit", "At most eight sessions per server");
     const slug = agent ?? `cu-${crypto.randomUUID().replaceAll("-", "").slice(0, 24)}`; const identity = sessionIdentity(false, slug);
     const lease = acquireLease(slug); let client: AgentCDP | undefined; let launched = false;

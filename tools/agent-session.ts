@@ -15,6 +15,10 @@ export interface SessionIdentity {
   readonly agent: string | undefined;
 }
 
+// Settings → ArcMod → Agent browser tools (on unless turned off): whether tools/agent-mcp.ts may open sessions.
+export const agentToolsEnabled = (): boolean =>
+  Bun.spawnSync(["defaults", "read", "company.thebrowser.Browser.mod", "ArcModAgentToolsEnabled"]).stdout.toString().trim() !== "0";
+
 export const sessionIdentity = (validation = false, agent?: string): SessionIdentity => {
   if (validation && agent !== undefined) throw new Error("--validation and --agent cannot be combined");
   if (agent !== undefined) {

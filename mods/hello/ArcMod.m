@@ -121,6 +121,7 @@ static NSString *const ArcModHideSidebarMarkerKey = @"ArcModHideSidebarMarker";
 static NSString *const ArcModHideIconBadgeKey = @"ArcModHideIconBadge";
 static NSString *const ArcModAppNameKey = @"ArcModAppName";
 static NSString *const ArcModLittleArcPerLinkKey = @"ArcModLittleArcPerLink";
+static NSString *const ArcModAgentToolsKey = @"ArcModAgentToolsEnabled";
 
 // Agent tools find an agent build's windows by its marker, so agent builds always show it.
 static BOOL ArcModSidebarMarkerShown(void) {
@@ -152,8 +153,9 @@ static void ArcModImportFromArc(void);
 static NSString *gAvailableUpdate;
 static void ArcModRefreshAppIcon(BOOL rewriteBundle);
 
-// Only the normal ArcMod can be renamed; tools/build-mod.ts re-applies the name to that build alone.
-static BOOL ArcModCanRename(void) {
+// The everyday ArcMod (not a test or agent build): it alone can be renamed (tools/build-mod.ts re-applies the
+// name to that build) and holds the agent tools setting that tools/agent-session.ts reads.
+static BOOL ArcModIsEverydayBuild(void) {
 	return [NSBundle.mainBundle.bundleIdentifier isEqualToString:@"company.thebrowser.Browser.mod"];
 }
 
@@ -161,7 +163,7 @@ static BOOL ArcModCanRename(void) {
 // the unlocalized one, so renaming never moves ArcMod's data. tools/build-mod.ts writes the same files.
 // Returns NO if a file couldn't be written.
 static BOOL ArcModApplyAppName(void) {
-	if (!ArcModCanRename()) return YES;
+	if (!ArcModIsEverydayBuild()) return YES;
 	NSString *name = [NSUserDefaults.standardUserDefaults stringForKey:ArcModAppNameKey];
 	NSString *resources = NSBundle.mainBundle.resourcePath;
 	NSFileManager *files = NSFileManager.defaultManager;
@@ -202,6 +204,16 @@ static BOOL ArcModOneLittleArc(void) {
 static void ArcModApplyLittleArcSetting(void) {
 	if (ArcModOneLittleArc()) unsetenv("ARCMOD_LITTLE_ARC_PER_LINK");
 	else setenv("ARCMOD_LITTLE_ARC_PER_LINK", "1", 1);
+}
+
+// Read by tools/agent-mcp.ts (through tools/agent-session.ts) before it opens an agent browser.
+static BOOL ArcModAgentToolsOn(void) {
+	id value = [NSUserDefaults.standardUserDefaults objectForKey:ArcModAgentToolsKey];
+	return !value || [value boolValue];
+}
+
+static void ArcModSetAgentToolsOn(BOOL on) {
+	[NSUserDefaults.standardUserDefaults setBool:on forKey:ArcModAgentToolsKey];
 }
 
 static void ArcModSetOneLittleArc(BOOL one) {
@@ -302,7 +314,7 @@ static void ArcModRefreshSettingsPane(void);
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-	if (item.action == @selector(renameApp:)) return ArcModCanRename();
+	if (item.action == @selector(renameApp:)) return ArcModIsEverydayBuild();
 	if (item.action == @selector(importFromArc:)) return !ArcModAgentSession().length;
 	if (item.action == @selector(update:)) {
 		item.title = gAvailableUpdate ? [NSString stringWithFormat:@"Update to %@…", gAvailableUpdate] : @"Check for Updates…";
@@ -886,10 +898,10 @@ static NSView *ArcModBuildSettingsPane(void) {
 	name.placeholderString = @"ArcMod";
 	name.target = gSettingsTarget;
 	name.action = @selector(rename:);
-	name.enabled = ArcModCanRename();
+	name.enabled = ArcModIsEverydayBuild();
 	[name.widthAnchor constraintEqualToConstant:150].active = YES;
 	gSettingsTarget.nameField = name;
-	NSStackView *nameControl = [NSStackView stackViewWithViews:@[name, ArcModSettingsButton(@"Rename", @selector(rename:), ArcModCanRename())]];
+	NSStackView *nameControl = [NSStackView stackViewWithViews:@[name, ArcModSettingsButton(@"Rename", @selector(rename:), ArcModIsEverydayBuild())]];
 	nameControl.spacing = 6;
 	NSString *version = [NSBundle.mainBundle objectForInfoDictionaryKey:@"ArcModVersion"];
 	NSString *updateTitle = gAvailableUpdate ? [NSString stringWithFormat:@"Update to %@…", gAvailableUpdate] : @"Check for Updates…";
@@ -905,6 +917,11 @@ static NSView *ArcModBuildSettingsPane(void) {
 		ArcModSettingsGroup(@[
 			ArcModSettingsRow(@"One Little Arc", @"Links reuse the open Little Arc window. Off: Arc's behavior, a new Little Arc unless the link is for the same site. Turning it back on closes extra Little Arcs.",
 				ArcModSettingsSwitch(ArcModOneLittleArc(), @selector(setOneLittleArc:), !agent)),
+		]),
+		ArcModSettingsLabel(@"Agents", 13, NSFontWeightSemibold, NSColor.labelColor),
+		ArcModSettingsGroup(@[
+			ArcModSettingsRow(@"Agent browser tools", @"Lets coding agents open their own background ArcMod browsers through the local MCP server (tools/agent-mcp.ts). Your windows aren't affected either way.",
+				ArcModSettingsSwitch(ArcModAgentToolsOn(), @selector(setAgentTools:), ArcModIsEverydayBuild())),
 		]),
 		ArcModSettingsLabel(@"Your data", 13, NSFontWeightSemibold, NSColor.labelColor),
 		ArcModSettingsGroup(@[
@@ -1001,6 +1018,7 @@ static void ArcModShowSettingsPaneIn(NSToolbar *toolbar) {
 - (void)setSidebarMarker:(NSSwitch *)sender { ArcModSetSidebarMarkerShown(sender.state == NSControlStateValueOn); }
 - (void)setIconBadge:(NSSwitch *)sender { ArcModSetIconBadgeShown(sender.state == NSControlStateValueOn); }
 - (void)setOneLittleArc:(NSSwitch *)sender { ArcModSetOneLittleArc(sender.state == NSControlStateValueOn); }
+- (void)setAgentTools:(NSSwitch *)sender { ArcModSetAgentToolsOn(sender.state == NSControlStateValueOn); }
 - (void)setAutomaticUpdates:(NSSwitch *)sender { ArcModSetAutomaticUpdateChecks(sender.state == NSControlStateValueOn); }
 - (void)rename:(id)sender { if (self.nameField) ArcModRename(self.nameField.stringValue); }
 - (void)importFromArc:(id)sender { ArcModImportFromArc(); }

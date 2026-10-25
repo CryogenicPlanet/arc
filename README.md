@@ -68,15 +68,6 @@ If ArcMod is open, the update builds first and then waits for you to quit it. It
 checkout without local changes. Arc itself never updates: ArcMod stays on
 Arc 1.168.0's app.
 
-## Which branch?
-
-| Branch | What you get |
-| --- | --- |
-| `master` | Everything below: no sign-in, service blocking, one Little Arc, performance tweaks, agent browser tools, app icons and the ArcMod menu. |
-| `no-login` | Only what's needed to use Arc without an account, plus service blocking. |
-
-Releases are tagged `vX.Y.Z` on `master` and `vX.Y.Z-no-login` on `no-login`.
-
 ## What it does
 
 - **No sign-in.** The account onboarding screen never opens. Windows, tabs, links, keyboard
@@ -94,16 +85,22 @@ Releases are tagged `vX.Y.Z` on `master` and `vX.Y.Z-no-login` on `no-login`.
   background browser. See [Agent browser tools](#agent-browser-tools).
 - **Separate data.** ArcMod keeps everything in `~/Library/Application Support/ArcMod`.
 
-## Make it look like Arc
+## Settings
 
-The **ArcMod** menu in the menu bar has a few switches:
+ArcMod's own settings are in **Settings → ArcMod** (also **ArcMod → ArcMod Settings…** in the
+menu bar):
 
-- **Show ARC MOD in Sidebar** turns the `ARC MOD` marker at the bottom of the sidebar on or
-  off.
-- **Show MOD Badge on App Icon** turns the badge on the Dock and Finder icon on or off.
-- **Rename App…** changes the name in the menu bar, Dock and Finder, for example back to
-  "Arc". It takes effect the next time ArcMod starts, and rebuilds keep it. ArcMod's data stays
-  in `~/Library/Application Support/ArcMod` whatever you call it.
+- **Show ARC MOD in the sidebar** and **Show the MOD badge on the app icon** turn the marker at
+  the bottom of the sidebar and the badge on the Dock and Finder icon on or off.
+- **App name** changes the name in the menu bar, Dock and Finder, for example back to "Arc". It
+  takes effect the next time ArcMod starts, and rebuilds keep it. ArcMod's data stays in
+  `~/Library/Application Support/ArcMod` whatever you call it.
+- **One Little Arc** makes every link reuse the open Little Arc. Turn it off for Arc's behavior.
+- **Agent browser tools** lets coding agents open their own background browsers.
+- **Import from Arc** and **Updates** are there too.
+
+To use ArcMod as plain Arc without an account, turn off the marker, the badge, One Little Arc
+and the agent tools. Account-free use, service blocking and the performance changes stay on.
 
 ## What you give up
 
@@ -149,7 +146,8 @@ codex mcp add arcmod -- /absolute/path/to/bun /absolute/path/to/arc/tools/agent-
 
 Call `open_session` to get a fresh background browser with its own profile, then use
 `open_tab`, `read_page`, `click`, `type`, `navigate`, `screenshot` and `wait_for`. Agent
-browsers don't take focus or touch your own ArcMod windows.
+browsers don't take focus or touch your own ArcMod windows. To turn the tools off, use
+**Settings → ArcMod → Agent browser tools**; `open_session` then refuses.
 [computer-use-tools.md](notes/computer-use-tools.md) covers every tool and its limits.
 
 ## Passkeys

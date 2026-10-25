@@ -9,7 +9,9 @@ ArcMod is a patched copy of Arc **1.168.0 (88413), arm64**, built next to the re
 ID, name and data folder. It runs without an Arc account, blocks The Browser Company's services, and adds
 tools for coding agents. `/Applications/Arc.app` and the original Arc profile are never modified.
 
-- `master` has every feature; `no-login` has only account-free use and service blocking.
+- One branch, `master`. The extras (sidebar marker, icon badge, One Little Arc, agent tools, update
+  checks) are switches in Settings → ArcMod; the old `no-login` branch is archived as the
+  `no-login-final` tag.
 - The engine (`ArcCore.framework`) is Arc's own by default. Our replacement built from Chromium source is
   [Arc Engine](https://github.com/CryogenicPlanet/arc-engine), included as the `engine/` submodule. For
   engine development, clone it next to this repo as `../arc-engine`; its tests expect that layout.

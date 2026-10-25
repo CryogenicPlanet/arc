@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
-// Updates this checkout to the newest ArcMod release for its branch and rebuilds ArcMod with the same engine.
+// Updates this checkout to the newest ArcMod release and rebuilds ArcMod with the same engine.
 //   bun tools/update.ts                         update and rebuild; if ArcMod is open, waits for you to quit it
 //   bun tools/update.ts --check                 only report
 //   bun tools/update.ts --quit-arcmod --relaunch [--app <ArcMod.app>]
 //       what ArcMod's "Update…" menu item runs: everything that can fail (checks, source update, build) happens
 //       while ArcMod keeps running; then it asks ArcMod to quit, swaps in the new build and reopens ArcMod.
-// Releases are tags: vX.Y.Z on master and vX.Y.Z-no-login on no-login.
+// Releases are vX.Y.Z tags on master.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { everydayApp, flagValue, runningAt, stagedApp, swapInStagedApp } from "./build-paths";
@@ -15,7 +15,6 @@ const RELEASES = "https://api.github.com/repos/CryogenicPlanet/arc/releases?per_
 const APP = "ArcMod";
 const BUNDLE_ID = "company.thebrowser.Browser.mod";
 
-export type Channel = "master" | "no-login";
 type Version = readonly [number, number, number];
 type Release = { readonly tag: string; readonly url: string; readonly version: Version };
 
@@ -24,31 +23,23 @@ const git = (...args: string[]): { readonly ok: boolean; readonly out: string } 
   return { ok: result.success, out: result.stdout.toString().trim() };
 };
 
-export const tagPattern = (channel: Channel): RegExp => channel === "master" ? /^v(\d+)\.(\d+)\.(\d+)$/ : /^v(\d+)\.(\d+)\.(\d+)-no-login$/;
+const TAG = /^v(\d+)\.(\d+)\.(\d+)$/;
 
-export const parseVersion = (tag: string, channel: Channel): Version | undefined => {
-  const match = tagPattern(channel).exec(tag);
+export const parseVersion = (tag: string): Version | undefined => {
+  const match = TAG.exec(tag);
   return match ? [Number(match[1]), Number(match[2]), Number(match[3])] : undefined;
 };
 
 export const compareVersions = (a: Version, b: Version): number => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
 
-// The branch decides the channel; a detached checkout falls back to its nearest release tag.
-export const currentChannel = (): Channel => {
-  const branch = git("rev-parse", "--abbrev-ref", "HEAD").out;
-  if (branch === "master" || branch === "no-login") return branch;
-  return git("describe", "--tags", "--abbrev=0", "--match", "v*-no-login").ok ? "no-login" : "master";
-};
-
-// `git describe` limited to one channel's tags, as tools/build-mod.ts stamps it into ArcModVersion.
-export const describeArgs = (channel: Channel): readonly string[] =>
-  channel === "master" ? ["--match", "v[0-9]*", "--exclude", "*-no-login"] : ["--match", "v*-no-login"];
+// `git describe` limited to release tags, as tools/build-mod.ts stamps it into ArcModVersion.
+export const describeArgs: readonly string[] = ["--match", "v[0-9]*"];
 
 const isRelease = (value: unknown): value is { tag_name: string; html_url: string; draft: boolean; prerelease: boolean } =>
   typeof value === "object" && value !== null && typeof (value as { tag_name?: unknown }).tag_name === "string" &&
   typeof (value as { html_url?: unknown }).html_url === "string";
 
-export const latestRelease = async (channel: Channel): Promise<Release | undefined> => {
+export const latestRelease = async (): Promise<Release | undefined> => {
   const response = await fetch(RELEASES, { headers: { Accept: "application/vnd.github+json" } });
   if (!response.ok) throw new Error(`GitHub releases: HTTP ${response.status}`);
   const body: unknown = await response.json();
@@ -57,7 +48,7 @@ export const latestRelease = async (channel: Channel): Promise<Release | undefin
     .filter(isRelease)
     .filter((release) => !release.draft && !release.prerelease)
     .flatMap((release) => {
-      const version = parseVersion(release.tag_name, channel);
+      const version = parseVersion(release.tag_name);
       return version ? [{ tag: release.tag_name, url: release.html_url, version }] : [];
     })
     .toSorted((a, b) => compareVersions(b.version, a.version))[0];
@@ -67,11 +58,11 @@ export const latestRelease = async (channel: Channel): Promise<Release | undefin
 const target = everydayApp(flagValue(process.argv, "--app"));
 
 // The release the built app came from, from the ArcModVersion that tools/build-mod.ts stamps (`git describe`).
-const builtVersion = (channel: Channel): Version | undefined => {
+const builtVersion = (): Version | undefined => {
   const plist = join(target.path, "Contents/Info.plist");
   if (!existsSync(plist)) return undefined;
   const stamp = Bun.spawnSync(["defaults", "read", plist, "ArcModVersion"]).stdout.toString().trim();
-  return parseVersion(stamp.replace(/-\d+-g[0-9a-f]+/, "").replace(/-dirty$/, ""), channel);
+  return parseVersion(stamp.replace(/-\d+-g[0-9a-f]+/, "").replace(/-dirty$/, ""));
 };
 
 const builtEngine = (): string => {
@@ -91,16 +82,15 @@ const arcModRunning = (): boolean => runningAt(target.path).length > 0;
 const relaunch = (): void => void Bun.spawnSync([join(root, "tools/run-mod.sh"), "--app", target.path], { cwd: root, stdout: "inherit", stderr: "inherit" });
 
 const update = async (args: ReadonlySet<string>): Promise<void> => {
-  const channel = currentChannel();
-  const latest = await latestRelease(channel);
+  const latest = await latestRelease();
   if (!latest) {
-    console.log(`No ${channel} releases yet.`);
+    console.log("No releases yet.");
     return;
   }
   if (!git("fetch", "--quiet", "--tags", "origin").ok) throw new Error("couldn't fetch release tags from origin");
   if (!git("rev-parse", "--verify", "--quiet", `${latest.tag}^{commit}`).ok) throw new Error(`origin has no tag ${latest.tag}`);
   const needsSource = !git("merge-base", "--is-ancestor", latest.tag, "HEAD").ok;
-  const built = builtVersion(channel);
+  const built = builtVersion();
   const needsBuild = needsSource || !built || compareVersions(built, latest.version) < 0;
   if (!needsBuild) {
     console.log(`ArcMod is up to date (${latest.tag}).`);
@@ -113,7 +103,7 @@ const update = async (args: ReadonlySet<string>): Promise<void> => {
 
   if (needsSource) {
     const branch = git("rev-parse", "--abbrev-ref", "HEAD").out;
-    if (branch !== channel) throw new Error(`check out the ${channel} branch first (this checkout is on ${branch})`);
+    if (branch !== "master") throw new Error(`check out master first (this checkout is on ${branch})`);
     if (git("status", "--porcelain", "--untracked-files=no").out) throw new Error("this checkout has local changes; commit or stash them first");
     if (!git("merge-base", "--is-ancestor", "HEAD", latest.tag).ok) {
       throw new Error(`${branch} has commits that aren't in ${latest.tag}; update it yourself (git merge ${latest.tag})`);
