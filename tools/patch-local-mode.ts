@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { shortcutBridge, shortcutBridgeOffset } from "./shortcut-bridge";
 import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
 import { finalApp, stagedApp } from "./build-paths";
+import { littleArcBridge, littleArcBridgeAddress, littleArcOriginal, littleArcSiteReplacement } from "./little-arc-bridge";
 
 type Patch = { readonly address: bigint; readonly original: Buffer; readonly replacement: Buffer };
 const onboarding = Buffer.from("f44fbea9fd7b01a9fd430091f40300aaf30308aadbf7fc9700010036000080d23125fd97081480b9886a68381f010071e8079f1a020000142800805268020039fd7b41a9f44fc2a8c0035fd6", "hex");
@@ -32,11 +33,12 @@ const windowInstructions = [
 ];
 const localWindow = Buffer.alloc(windowInstructions.length * 4);
 windowInstructions.forEach((instruction, i) => localWindow.writeUInt32LE(instruction, i * 4));
-// Keep the WindowStyle.little check; accept any Little Arc instead of requiring
-// the same hostname/entry point. Arc's existing session and navigation path does the reuse.
-const littleArc = Buffer.from("e1031aaa10c72c941f0400718103005442bfff9042102191e00318aae1031baad82d5697941b80b9", "hex");
-const singleLittleArc = Buffer.from(littleArc);
-singleLittleArc.set(Buffer.from("c1fbfff021a02091e00318aaea2d5697280080521b000014", "hex"), 16);
+// Keep the WindowStyle.little check; then a bridge (tools/little-arc-bridge.ts) either accepts any Little Arc
+// (ArcMod's default, one Little Arc) or runs Arc's own same-hostname/entry-point check when
+// ARCMOD_LITTLE_ARC_PER_LINK is set. Arc's existing session and navigation path does the reuse.
+const littleArc = Buffer.from("e1031aaa10c72c941f0400718103005442bfff90" + littleArcOriginal.subarray(4).toString("hex"), "hex");
+const settableLittleArc = Buffer.from(littleArc);
+settableLittleArc.set(littleArcSiteReplacement, 16);
 // A user-opened URL must be routed even without an account. Keep the original
 // Optional<AuthSession> cleanup, then enter native local URL routing.
 const externalURL = Buffer.from("011802f021002d9142a301f042803991e00314aad05ef99760000014", "hex");
@@ -92,7 +94,8 @@ localAppIconAvailability.set(Buffer.from("00008052", "hex"), 20); // mov w0, #0 
 const patches: readonly Patch[] = [
   { address: 0x10186b3b0n, original: onboarding, replacement: localOnboarding },
   { address: windowAddress, original: Buffer.from("000080d2678f8697f40300aa08805ff8081940f9e00316aa21008052e20314aa00013fd61f04007101070054", "hex"), replacement: localWindow },
-  { address: 0x102a7cb50n, original: littleArc, replacement: singleLittleArc },
+  { address: 0x102a7cb50n, original: littleArc, replacement: settableLittleArc },
+  { address: littleArcBridgeAddress, original: Buffer.alloc(littleArcBridge.length), replacement: littleArcBridge },
   { address: 0x1001af7e8n, original: externalURL, replacement: localExternalURL },
   { address: 0x100dab520n, original: storableFormatting, replacement: compactFormatting },
   { address: 0x10143425cn, original: launchDarklyConfig, replacement: offlineLaunchDarklyConfig },

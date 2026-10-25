@@ -70,7 +70,8 @@ const launch = (args: readonly string[], options: { readonly running?: string; r
 
 describe("launcher argument semantics", () => {
   test("default and validation launches preserve their isolation", () => {
-    for (const [args, name, domain] of [[[], "ArcMod", "company.thebrowser.Browser.mod"], [["--validation"], "ArcModValidation", "company.thebrowser.Browser.mod.validation"]] as const) {
+    // --debug: the everyday ArcMod may also be installed in Applications, which run-mod.sh prefers otherwise.
+    for (const [args, name, domain] of [[["--debug"], "ArcMod", "company.thebrowser.Browser.mod"], [["--validation"], "ArcModValidation", "company.thebrowser.Browser.mod.validation"]] as const) {
       const result = launch(args);
       expect(result.success).toBe(true);
       expect(result.open).toContain(`${result.root}/build/${name}.app`);

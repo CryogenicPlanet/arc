@@ -120,6 +120,7 @@ static void ArcModInstallHooks(void) {
 static NSString *const ArcModHideSidebarMarkerKey = @"ArcModHideSidebarMarker";
 static NSString *const ArcModHideIconBadgeKey = @"ArcModHideIconBadge";
 static NSString *const ArcModAppNameKey = @"ArcModAppName";
+static NSString *const ArcModLittleArcPerLinkKey = @"ArcModLittleArcPerLink";
 
 // Agent tools find an agent build's windows by its marker, so agent builds always show it.
 static BOOL ArcModSidebarMarkerShown(void) {
@@ -189,6 +190,23 @@ static BOOL ArcModApplyAppName(void) {
 	}
 	if (failed) ArcModLog(@"app name: couldn't write every InfoPlist.strings in %@", resources);
 	return !failed;
+}
+
+// One Little Arc (the default): every link reuses the open Little Arc. Off: Arc's own behavior, which reuses one
+// only for the same site. The patched decision in Arc reads ARCMOD_LITTLE_ARC_PER_LINK (tools/little-arc-bridge.ts);
+// it's set and read on the main thread.
+static BOOL ArcModOneLittleArc(void) {
+	return ![NSUserDefaults.standardUserDefaults boolForKey:ArcModLittleArcPerLinkKey];
+}
+
+static void ArcModApplyLittleArcSetting(void) {
+	if (ArcModOneLittleArc()) unsetenv("ARCMOD_LITTLE_ARC_PER_LINK");
+	else setenv("ARCMOD_LITTLE_ARC_PER_LINK", "1", 1);
+}
+
+static void ArcModSetOneLittleArc(BOOL one) {
+	[NSUserDefaults.standardUserDefaults setBool:!one forKey:ArcModLittleArcPerLinkKey];
+	ArcModApplyLittleArcSetting();
 }
 
 // Setters shared by the ArcMod menu and Settings → ArcMod.
@@ -405,7 +423,7 @@ static void ArcModEnsureLocalWindow(void) {
 static void ArcModConsolidateLittleWindows(NSWindow *preferred) {
 	// Agent bundles have their own sidebar and ordinary browser windows. Never
 	// apply the human's singleton Little Arc policy to an agent's navigation.
-	if (ArcModAgentSession().length) return;
+	if (ArcModAgentSession().length || !ArcModOneLittleArc()) return;
 	if (![NSStringFromClass(preferred.class) isEqualToString:@"Arc.LittleBrowserWindow"]) return;
 	// A profile change uses Arc's native close-old/create-new path. Keep its chosen
 	// profile and new window; synchronously retire any previous Little Arc so there
@@ -883,6 +901,11 @@ static NSView *ArcModBuildSettingsPane(void) {
 			ArcModSettingsRow(@"Show the MOD badge on the app icon", nil, ArcModSettingsSwitch(ArcModIconBadgeShown(), @selector(setIconBadge:), YES)),
 			ArcModSettingsRow(@"App name", @"Shown in the menu bar, Dock and Finder from the next launch. Your data stays where it is.", nameControl),
 		]),
+		ArcModSettingsLabel(@"Little Arc", 13, NSFontWeightSemibold, NSColor.labelColor),
+		ArcModSettingsGroup(@[
+			ArcModSettingsRow(@"One Little Arc", @"Links reuse the open Little Arc window. Off: Arc's behavior, a new Little Arc unless the link is for the same site. Turning it back on closes extra Little Arcs.",
+				ArcModSettingsSwitch(ArcModOneLittleArc(), @selector(setOneLittleArc:), !agent)),
+		]),
 		ArcModSettingsLabel(@"Your data", 13, NSFontWeightSemibold, NSColor.labelColor),
 		ArcModSettingsGroup(@[
 			ArcModSettingsRow(@"Import from Arc", @"Copies cookies, site storage, extensions, history and permissions from Arc, so your sites stay signed in. Terminal walks you through it.",
@@ -977,6 +1000,7 @@ static void ArcModShowSettingsPaneIn(NSToolbar *toolbar) {
 }
 - (void)setSidebarMarker:(NSSwitch *)sender { ArcModSetSidebarMarkerShown(sender.state == NSControlStateValueOn); }
 - (void)setIconBadge:(NSSwitch *)sender { ArcModSetIconBadgeShown(sender.state == NSControlStateValueOn); }
+- (void)setOneLittleArc:(NSSwitch *)sender { ArcModSetOneLittleArc(sender.state == NSControlStateValueOn); }
 - (void)setAutomaticUpdates:(NSSwitch *)sender { ArcModSetAutomaticUpdateChecks(sender.state == NSControlStateValueOn); }
 - (void)rename:(id)sender { if (self.nameField) ArcModRename(self.nameField.stringValue); }
 - (void)importFromArc:(id)sender { ArcModImportFromArc(); }
@@ -1195,6 +1219,7 @@ static void ArcModEnsureSingleInstance(void) {
 
 __attribute__((constructor)) static void ArcModInit(void) {
 	ArcModEnsureSingleInstance();
+	ArcModApplyLittleArcSetting();
 	ArcModAddLaunchSwitches();
 	ArcModInstallSettingsPane();
 	ArcModInstallServicePolicy();

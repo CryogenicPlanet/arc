@@ -5,6 +5,9 @@ import { patchLocalMode } from "./patch-local-mode";
 import { hostResolverRules } from "./service-policy";
 import { shortcutBridge, shortcutBridgeOffset, shortcutBridgeSymbol } from "./shortcut-bridge";
 import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
+import { littleArcBridge, littleArcBridgeAddress, littleArcVariable } from "./little-arc-bridge";
+
+const littleArcBridgeOffset = Number(littleArcBridgeAddress - 0x100000000n);
 
 const binary = join(import.meta.dir, "../bin/Arc.arm64");
 describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () => {
@@ -17,8 +20,8 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     expect(Bun.hash(original)).toBe(originalDigest);
     const changed: number[] = [];
     original.forEach((byte, i) => { if (byte !== patched[i]) changed.push(i); });
-    expect(changed.length).toBe(230);
-    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb78) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4) || (i >= 0x1eee7f0 && i < 0x1eee7f4))).toBe(true);
+    expect(changed.length).toBe(301);
+    expect(changed.every((i) => i === 0x186b3ec || i === 0x1af800 || i === 0x31cb04 || (i >= 0x313cd0 && i < 0x313cd4) || (i >= shortcutBridgeOffset && i < shortcutBridgeOffset + shortcutBridge.length) || (i >= localCloseBridgeOffset && i < localCloseBridgeOffset + localCloseBridge.length) || (i >= 0x2a3ade8 && i < 0x2a3adec) || (i >= 0x2ab2f48 && i < 0x2ab2f4c) || (i >= 0x2a75744 && i < 0x2a75770) || (i >= 0x2a7cb60 && i < 0x2a7cb64) || (i >= littleArcBridgeOffset && i < littleArcBridgeOffset + littleArcBridge.length) || (i >= 0xdab528 && i < 0xdab52c) || i === 0x143426c || (i >= 0x1f5f79c && i < 0x1f5f7a4) || (i >= 0x1eee7f0 && i < 0x1eee7f4))).toBe(true);
     // The new call must destroy the optional session, and the branch must reach local bootstrap.
     const target = (offset: number): number => {
       const immediate = patched.readUInt32LE(offset) & 0x3ffffff;
@@ -27,8 +30,30 @@ describe.skipIf(!existsSync(binary))("Arc 1.168.0 local-mode binary patch", () =
     };
     expect(target(0x2a75758)).toBe(0x733c);
     expect(target(0x2a7575c)).toBe(0x2a75868);
-    expect(target(0x2a7cb6c)).toBe(0x8314);
-    expect(target(0x2a7cb74)).toBe(0x2a7cbe0);
+    // Little Arc: the site branches to the bridge; one Little Arc by default, Arc's own check when the variable is set.
+    expect(target(0x2a7cb60)).toBe(littleArcBridgeOffset);
+    expect(target(littleArcBridgeOffset + 4)).toBe(0x35ad864); // getenv stub
+    expect(target(littleArcBridgeOffset + 0x18)).toBe(0x8314);
+    expect(target(littleArcBridgeOffset + 0x20)).toBe(0x2a7cbe0);
+    expect(target(littleArcBridgeOffset + 0x34)).toBe(0x82d0);
+    expect(target(littleArcBridgeOffset + 0x3c)).toBe(0x2a7cb78);
+    expect(patched.subarray(0x2a7cb64, 0x2a7cb78)).toEqual(original.subarray(0x2a7cb64, 0x2a7cb78));
+    expect(patched.subarray(littleArcBridgeOffset + 64, littleArcBridgeOffset + 64 + littleArcVariable.length).toString()).toBe(littleArcVariable);
+    expect(original.subarray(littleArcBridgeOffset, littleArcBridgeOffset + littleArcBridge.length).every((byte) => byte === 0)).toBe(true);
+    // In __TEXT's file-backed padding: after the last section (__eh_frame ends 0x41526d8), before the segment's end.
+    expect(littleArcBridgeOffset).toBeGreaterThanOrEqual(0x41526d8);
+    expect(littleArcBridgeOffset + littleArcBridge.length).toBeLessThanOrEqual(0x4154000);
+    // adr/adrp+add targets: the variable name and the two metadata addresses.
+    const adrpAdd = (offset: number): number => {
+      const adrp = patched.readUInt32LE(offset), add = patched.readUInt32LE(offset + 4);
+      const immediate = ((adrp >>> 29) & 3) | (((adrp >>> 5) & 0x7ffff) << 2);
+      const pages = immediate & 0x100000 ? immediate - 0x200000 : immediate;
+      return (offset & ~0xfff) + pages * 4096 + ((add >>> 10) & 0xfff);
+    };
+    const adr = patched.readUInt32LE(littleArcBridgeOffset);
+    expect(littleArcBridgeOffset + ((((adr >>> 5) & 0x7ffff) << 2) | ((adr >>> 29) & 3))).toBe(littleArcBridgeOffset + 64);
+    expect(adrpAdd(littleArcBridgeOffset + 0xc)).toBe(0x29f7828);
+    expect(adrpAdd(littleArcBridgeOffset + 0x24)).toBe(0x2264844);
     expect(target(0x1af800)).toBe(0x1af868);
     expect(target(0x31cb04)).toBe(0x31cb50);
     expect(target(0x1f5f7a0)).toBe(0x1f5f89c);

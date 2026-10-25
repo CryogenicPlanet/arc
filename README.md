@@ -85,7 +85,7 @@ Releases are tagged `vX.Y.Z` on `master` and `vX.Y.Z-no-login` on `no-login`.
 - **Blocks The Browser Company's services.** Requests from Arc's native code to its backend,
   sync, LaunchDarkly, Sentry, Segment and Datadog fail locally.
 - **One Little Arc.** Links reuse the open Little Arc window instead of opening a new one each
-  time.
+  time. Turn it off in **Settings → ArcMod** to get Arc's behavior back.
 - **Lighter.** State files are written as compact JSON, LaunchDarkly starts offline and some
   background telemetry is turned off.
 - **Arc's app icons.** All seven icons in **Settings → Icon** are available, not just the
