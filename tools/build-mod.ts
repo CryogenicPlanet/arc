@@ -17,7 +17,7 @@ import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
 import { defaultArcSource } from "./arc-source";
 import { fetchEngine } from "./fetch-engine";
-import { finalApp, runningApp, stagedApp, swapInStagedApp } from "./build-paths";
+import { finalApp, installedApp, runningAt, stagedApp, swapInStagedApp } from "./build-paths";
 import { currentChannel, describeArgs } from "./update";
 import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 import { parseBuildOptions } from "./agent-session";
@@ -35,7 +35,9 @@ const ENGINE = options.engine === "release" ? await fetchEngine() : options.engi
 const SOURCE = Bun.argv.includes("--source") ? options.source : defaultArcSource();
 const { appName, bundleId: MOD_BUNDLE_ID } = session;
 // Built into a staging bundle and swapped in at the end, so a failed build leaves the previous app in place.
-const FINAL = finalApp(appName);
+// The everyday ArcMod is installed in Applications unless --debug; test and agent builds stay in build/.
+const INSTALL = session.agent === undefined && appName === "ArcMod" && !options.debug;
+const FINAL = INSTALL ? installedApp() : finalApp(appName);
 const OUT = stagedApp(appName);
 const DYLIB_INSTALL = "@executable_path/../Frameworks/ArcMod.dylib";
 
@@ -67,7 +69,7 @@ const depth = (p: string): number => p.split("/").length;
 
 // A staged build (--stage-only) can be made while the app runs; replacing the app can't.
 const assertOutputStopped = (): void => {
-  const running = runningApp(appName);
+  const running = runningAt(FINAL);
   if (running.length > 0) throw new Error(`refusing to overwrite running ${appName}: ${running.map((line) => line.trim()).join(", ")}`);
 };
 if (!options.stageOnly) assertOutputStopped();
@@ -188,6 +190,16 @@ if (options.stageOnly) {
   console.log(`\nstaged ${relative(root, OUT)} from Arc ${version}`);
 } else {
   assertOutputStopped();
-  swapInStagedApp(appName);
-  console.log(`\nbuilt ${relative(root, FINAL)} from Arc ${version}`);
+  swapInStagedApp(appName, FINAL);
+  if (INSTALL) {
+    // One everyday ArcMod: drop an older build/ArcMod.app so two copies don't share the bundle ID.
+    const lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister";
+    if (existsSync(finalApp(appName)) && runningAt(finalApp(appName)).length === 0) {
+      Bun.spawnSync([lsregister, "-u", finalApp(appName)]);
+      rmSync(finalApp(appName), { recursive: true, force: true });
+      console.log(`  removed the old ${relative(root, finalApp(appName))}; re-pin ArcMod in the Dock if you had it there`);
+    }
+    Bun.spawnSync([lsregister, "-f", FINAL]);
+  }
+  console.log(`\nbuilt ${INSTALL ? FINAL : relative(root, FINAL)} from Arc ${version}`);
 }

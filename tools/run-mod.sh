@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Launch an isolated mod bundle via LaunchServices; --background uses open -g.
-#   tools/run-mod.sh [--validation | --agent <slug>] [--background] [--guard]
+#   tools/run-mod.sh [--validation | --agent <slug> | --debug | --app <ArcMod.app>] [--background] [--guard]
 #                    [--cdp-port <1024-65535>] [extra Chromium switches…]
+# The everyday ArcMod is installed in /Applications (or ~/Applications) and also opens like any app; this
+# launches it, or with --debug the build in build/ArcMod.app (bun tools/build-mod.ts --debug).
 # CFBundleName isolates Arc's sidebar and Chromium data, even where Arc ignores --user-data-dir.
 # Agent sessions additionally request their own Chromium directory and optional loopback CDP.
 # --guard is a verification-only sandbox (Chromium's nested sandbox must be disabled).
@@ -11,6 +13,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 GUARD=0
 BACKGROUND=0
 VALIDATION=0
+DEBUG=0
+APP_PATH=""
 AGENT=""
 CDP_PORT=""
 EXTRA_ARGS=()
@@ -18,17 +22,18 @@ SEEN=" "
 fail() { echo "$*" >&2; exit 1; }
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --guard|--validation|--background|--agent|--cdp-port)
+    --guard|--validation|--background|--agent|--cdp-port|--debug|--app)
       FLAG="$1"
       [[ "$SEEN" != *" $FLAG "* ]] || fail "duplicate launch argument: $FLAG"
       SEEN="$SEEN$FLAG "
       case "$FLAG" in
         --guard) GUARD=1; shift ;;
         --validation) VALIDATION=1; shift ;;
+        --debug) DEBUG=1; shift ;;
         --background) BACKGROUND=1; shift ;;
-        --agent|--cdp-port)
+        --agent|--cdp-port|--app)
           [[ $# -ge 2 && -n "$2" && "$2" != --* ]] || fail "missing value for $FLAG"
-          if [[ "$FLAG" == --agent ]]; then AGENT="$2"; else CDP_PORT="$2"; fi
+          case "$FLAG" in --agent) AGENT="$2" ;; --cdp-port) CDP_PORT="$2" ;; --app) APP_PATH="$2" ;; esac
           shift 2 ;;
       esac
       ;;
@@ -63,12 +68,23 @@ if [[ -n "$AGENT" ]]; then
   done
 fi
 APP="$ROOT/build/$APP_NAME.app"
+if [[ -n "$APP_PATH" ]]; then
+  APP="$APP_PATH"
+  APP_NAME="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleName' "$APP/Contents/Info.plist" 2>/dev/null || true)"
+  [[ "$APP_NAME" == ArcMod || "$APP_NAME" == ArcModValidation ]] || fail "not an ArcMod app: $APP"
+  [[ "$APP_NAME" == ArcMod ]] || { DOMAIN=company.thebrowser.Browser.mod.validation; VALIDATION=1; }
+elif [[ "$APP_NAME" == ArcMod && $DEBUG == 0 ]]; then
+  for INSTALLED in /Applications/ArcMod.app "$HOME/Applications/ArcMod.app"; do
+    if [[ -d "$INSTALLED" ]]; then APP="$INSTALLED"; break; fi
+  done
+fi
 EXE="$APP/Contents/MacOS/Arc"
 DATA="$HOME/Library/Application Support/$APP_NAME"
 LOG="$ROOT/build/$APP_NAME-run.log"
 
 BUILD_OPTIONS=""
 [[ $VALIDATION == 0 ]] || BUILD_OPTIONS=" --validation"
+[[ $DEBUG == 0 ]] || BUILD_OPTIONS=" --debug"
 [[ -z "$AGENT" ]] || BUILD_OPTIONS=" --agent $AGENT"
 [[ -x "$EXE" ]] || fail "build first: bun tools/build-mod.ts$BUILD_OPTIONS"
 MOD_PIDS="$(pgrep -f "(^|/)$APP_NAME[.]app/Contents/MacOS/Arc( |$)" || true)"
