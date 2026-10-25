@@ -64,7 +64,8 @@ bun tools/update.ts           # update to the newest release and rebuild
 bun tools/update.ts --check   # only report
 ```
 
-The update needs a checkout without local changes. Arc itself never updates: ArcMod stays on
+If ArcMod is open, the update builds first and then waits for you to quit it. It needs a
+checkout without local changes. Arc itself never updates: ArcMod stays on
 Arc 1.168.0's app.
 
 ## Which branch?

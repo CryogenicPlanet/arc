@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 // Updates this checkout to the newest ArcMod release for its branch and rebuilds ArcMod with the same engine.
-//   bun tools/update.ts                         update and rebuild (quit ArcMod first)
+//   bun tools/update.ts                         update and rebuild; if ArcMod is open, waits for you to quit it
 //   bun tools/update.ts --check                 only report
 //   bun tools/update.ts --quit-arcmod --relaunch
 //       what ArcMod's "Update…" menu item runs: everything that can fail (checks, source update, build) happens
@@ -125,9 +125,12 @@ const update = async (args: ReadonlySet<string>): Promise<void> => {
   run(["bun", "tools/build-mod.ts", "--stage-only", ...(engine === "arc" ? [] : ["--engine", engine])],
     `build ArcMod (${engine === "arc" ? "Arc's engine" : `engine: ${engine}`})`);
   if (arcModRunning()) {
-    if (!args.has("--quit-arcmod")) throw new Error(`quit ArcMod, then run this again (the new build is staged at ${stagedApp(APP)})`);
-    console.log("• asking ArcMod to quit (confirm in ArcMod if it asks)");
-    Bun.spawnSync(["osascript", "-e", `tell application id "${BUNDLE_ID}" to quit`]);
+    if (args.has("--quit-arcmod")) {
+      console.log("• asking ArcMod to quit (confirm in ArcMod if it asks)");
+      Bun.spawnSync(["osascript", "-e", `tell application id "${BUNDLE_ID}" to quit`]);
+    } else {
+      console.log(`• the new build is ready (${stagedApp(APP)}); quit ArcMod to finish`);
+    }
     while (arcModRunning()) await Bun.sleep(500);
   }
   swapInStagedApp(APP);
