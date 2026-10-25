@@ -121,6 +121,15 @@ __attribute__((constructor)) static void ArcModInit(void) {
 		@"outlookCalendarPreviewEnabled", @"outlookEmailPreviewEnabled", @"notionCalendarPreviewEnabled"])
 		[defaults setBool:NO forKey:key];
 	[defaults setBool:YES forKey:@"shouldSkipUnboxingVideo"];
+	// Arc reopens your windows only when its "restore windows from previous session" setting is on. On first
+	// launch Arc copies that from macOS's "Close windows when quitting an application", which is on by default,
+	// so it starts off. Turn it on once (Arc's Settings can turn it off), with the per-app AppKit preference Arc
+	// sets alongside it.
+	if (![defaults boolForKey:@"ArcModRestoreWindowsDefaulted"]) {
+		[defaults setBool:YES forKey:@"arc_quitAlwaysKeepsWindows"];
+		[defaults setBool:YES forKey:@"NSQuitAlwaysKeepsWindows"];
+		[defaults setBool:YES forKey:@"ArcModRestoreWindowsDefaulted"];
+	}
 	ArcModLog(@"loaded into %s (main image slide 0x%lx)", _dyld_get_image_name(0), (unsigned long)_dyld_get_image_vmaddr_slide(0));
 	[[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidFinishLaunchingNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
 		ArcModLog(@"didFinishLaunching, NSApp class = %@", NSStringFromClass([NSApp class]));
