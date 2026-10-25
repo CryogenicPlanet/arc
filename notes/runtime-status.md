@@ -1,5 +1,8 @@
 # ArcMod runtime status
 
+Known problems are listed in the [status issue](https://github.com/CryogenicPlanet/arc/issues/1). This file records what has been
+checked, how, and the limits of each check.
+
 Target: Arc 1.168.0 (88413), arm64. Most of this was verified on 2026-10-13; later
 changes are listed first. It is not a known-good shortcut baseline.
 
