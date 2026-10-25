@@ -5,8 +5,10 @@
 - Read `README.md`, `notes/runtime-status.md`, and relevant sections of
   `notes/HANDOFF.md` before changing behavior. Runtime status takes precedence over
   older survey notes.
-- Target Arc **1.168.0 (88413), arm64**. Keep changes in the native app layer;
-  Chromium engine code is currently unchanged.
+- Target Arc **1.168.0 (88413), arm64**. Keep changes in the native app layer.
+  ArcMod runs on Arc's own engine by default; our engine is the `engine/`
+  submodule ([Arc Engine](https://github.com/CryogenicPlanet/arc-engine)), which has
+  its own `AGENTS.md`.
 - Preserve local account-free behavior, service filtering and single Little Arc.
   Follow Arc's native design for UI changes.
 
