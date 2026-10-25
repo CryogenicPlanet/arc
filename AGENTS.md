@@ -2,9 +2,9 @@
 
 ## Context
 
-- Read `README.md`, `notes/runtime-status.md`, and relevant sections of
-  `notes/HANDOFF.md` before changing behavior. Runtime status takes precedence over
-  older survey notes.
+- Read `README.md`, the status issue (https://github.com/CryogenicPlanet/arc/issues/1), `notes/runtime-status.md`,
+  and relevant sections of `notes/HANDOFF.md` before changing behavior. The status issue
+  and runtime status take precedence over older survey notes.
 - Target Arc **1.168.0 (88413), arm64**. Keep changes in the native app layer.
   ArcMod runs on Arc's own engine by default; our engine is the `engine/`
   submodule ([Arc Engine](https://github.com/CryogenicPlanet/arc-engine)), which has
@@ -38,5 +38,8 @@
   browser data, credentials, app bundles or profiling captures. The 1.168.0
   decompile, dumps, executable and app bundle are tracked with Git LFS; the Ghidra
   project stays local.
-- Record current findings and validation limits in `notes/`. Passing binary tests
+- When you find or fix a problem, update the status issue's list of known problems
+  (`gh issue edit 1 -R CryogenicPlanet/arc --body-file <file>`, keeping its layout and the
+  "Updated" date); don't keep separate status lists in docs. Record findings, evidence and
+  validation limits in `notes/`. Passing binary tests
   does not prove every shortcut works; separate source checks from live results.
