@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { defaultArcSource } from "./arc-source";
 import generated from "../resources/shortcut-generated-inventory.json";
 import policy from "../resources/local-shortcut-policy.json";
 
@@ -42,6 +43,6 @@ export function verifyGeneratedShortcutImage(bytes: Buffer) {
   return generated.families;
 }
 
-export function verifyGeneratedShortcutCoverage(source = "/Applications/Arc.app") {
+export function verifyGeneratedShortcutCoverage(source = defaultArcSource()) {
   return verifyGeneratedShortcutImage(readFileSync(join(source, "Contents/MacOS/Arc")));
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
-// Builds build/ArcMod.app: a local-mode APFS clone of /Applications/Arc.app.
+// Builds build/ArcMod.app: a local-mode APFS clone of Arc 1.168.0 (/Applications/Arc.app while it's still
+// 1.168.0, else the copy in bin/).
 //   - own bundle id (company.thebrowser.Browser.mod) and Sparkle auto-update disabled
 //   - arm64 executable, required ArcMod.dylib, fingerprinted local UI/URL patches
 //   - every nested binary re-signed ad hoc, inside-out, WITHOUT hardened runtime (so no library
@@ -7,24 +8,40 @@
 // /Applications/Arc.app is never modified.
 //
 //   bun tools/build-mod.ts [--source /Applications/Arc.app] [--validation]
-//                          [--engine <ArcCore.framework>]   (our engine built from Chromium; see README)
+//                          [--engine <ArcCore.framework> | --engine release]   (Arc Engine; see README)
+//                          [--stage-only]   (leave the build staged; tools/update.ts swaps it in)
 
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { hostResolverRules, servicePolicyHeader } from "./service-policy";
 import { shortcutPolicyHeader } from "./shortcut-policy";
+import { defaultArcSource } from "./arc-source";
+import { fetchEngine } from "./fetch-engine";
+import { finalApp, runningApp, stagedApp, swapInStagedApp } from "./build-paths";
+import { currentChannel, describeArgs } from "./update";
 import { verifyShippedShortcutCoverage } from "./shortcut-coverage";
 
 const root = join(import.meta.dir, "..");
 const argSource = Bun.argv.indexOf("--source");
-const SOURCE = argSource >= 0 ? (Bun.argv[argSource + 1] ?? "") : "/Applications/Arc.app";
+// Without --source: the installed Arc while it's still 1.168.0, else the copy in bin/.
+const SOURCE = argSource >= 0 ? (Bun.argv[argSource + 1] ?? "") : defaultArcSource();
 const validation = Bun.argv.includes("--validation");
 // An ArcCore.framework to use instead of the source app's own engine (e.g. one built from Chromium).
 const argEngine = Bun.argv.indexOf("--engine");
-const ENGINE = argEngine >= 0 ? Bun.argv[argEngine + 1] : undefined;
-if (argEngine >= 0 && (!ENGINE || ENGINE.startsWith("--"))) throw new Error("missing value for --engine");
+const engineArg = argEngine >= 0 ? Bun.argv[argEngine + 1] : undefined;
+if (argEngine >= 0 && (!engineArg || engineArg.startsWith("--"))) throw new Error("missing value for --engine");
+// --engine release: the Arc Engine release this commit pins, downloaded and checked by tools/fetch-engine.ts.
+const ENGINE = engineArg === "release" ? await fetchEngine() : engineArg === undefined ? undefined : resolve(engineArg);
+const stageOnly = Bun.argv.includes("--stage-only");
 const appName = validation ? "ArcModValidation" : "ArcMod";
-const OUT = join(root, `build/${appName}.app`);
+// Built into a staging bundle and swapped in at the end, so a failed build leaves the previous app in place.
+const FINAL = finalApp(appName);
+const OUT = stagedApp(appName);
+const assertOutputStopped = (): void => {
+  const running = runningApp(appName);
+  if (running.length > 0) throw new Error(`refusing to overwrite running ${appName}: ${running.map((line) => line.trim()).join(", ")}`);
+};
+if (!stageOnly) assertOutputStopped();
 const MOD_BUNDLE_ID = validation ? "company.thebrowser.Browser.mod.validation" : "company.thebrowser.Browser.mod";
 const DYLIB_INSTALL = "@executable_path/../Frameworks/ArcMod.dylib";
 
@@ -75,7 +92,7 @@ sh([
   join(root, "mods/local/ShortcutPolicy.m"),
 ]);
 
-step(`APFS-clone app → build/${appName}.app`);
+step(`APFS-clone app → ${relative(root, OUT)}`);
 rmSync(OUT, { recursive: true, force: true });
 sh(["cp", "-cR", SOURCE, OUT]);
 if (ENGINE !== undefined) {
@@ -107,6 +124,11 @@ plutil("-insert", "ArcModHostResolverRules", "-string", hostResolverRules);
 plutil("-replace", "SUEnableAutomaticChecks", "-bool", "NO");
 plutil("-replace", "SUAutomaticallyUpdate", "-bool", "NO");
 plutil("-replace", "SUFeedURL", "-string", "https://127.0.0.1:9/arcmod-updates-disabled.xml");
+// Read by tools/update.ts: the release this build came from, its engine and its source.
+const describe = Bun.spawnSync(["git", "-C", root, "describe", "--tags", "--always", "--dirty", ...describeArgs(currentChannel())]).stdout.toString().trim();
+plutil("-insert", "ArcModVersion", "-string", describe || "unknown");
+plutil("-insert", "ArcModBuildEngine", "-string", engineArg === "release" ? "release" : ENGINE ?? "arc");
+plutil("-insert", "ArcModRepository", "-string", root);
 rmSync(join(OUT, "Contents/embedded.provisionprofile"), { force: true });
 
 step("main executable: thin to arm64, strip signature, apply local patches, insert required dylib");
@@ -140,4 +162,10 @@ step("verify");
 sh(["codesign", "--verify", "--deep", "--strict", OUT], { quiet: true });
 const loads = sh(["otool", "-L", exe]).split("\n").filter((l) => l.includes("ArcMod"));
 console.log(`  codesign --verify --deep --strict: ok\n  ${loads.join("\n  ").trim()}`);
-console.log(`\nbuilt ${relative(root, OUT)} from Arc ${version}`);
+if (stageOnly) {
+  console.log(`\nstaged ${relative(root, OUT)} from Arc ${version}`);
+} else {
+  assertOutputStopped();
+  swapInStagedApp(appName);
+  console.log(`\nbuilt ${relative(root, FINAL)} from Arc ${version}`);
+}

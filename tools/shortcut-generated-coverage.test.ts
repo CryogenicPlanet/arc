@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { defaultArcSource } from "./arc-source";
 import { arm64Image, verifyGeneratedShortcutImage } from "./shortcut-generated-coverage";
 import generated from "../resources/shortcut-generated-inventory.json";
 import policy from "../resources/local-shortcut-policy.json";
@@ -8,7 +9,7 @@ import policy from "../resources/local-shortcut-policy.json";
 const image = readFileSync(join(import.meta.dir, "../bin/Arc.arm64"));
 test("generated menu constructors and native validators match the pinned binary", () => {
   expect(verifyGeneratedShortcutImage(image)).toEqual(generated.families);
-  expect(verifyGeneratedShortcutImage(readFileSync("/Applications/Arc.app/Contents/MacOS/Arc"))).toEqual(generated.families);
+  expect(verifyGeneratedShortcutImage(readFileSync(join(defaultArcSource(), "Contents/MacOS/Arc")))).toEqual(generated.families);
   const count = generated.families.reduce((sum, family) => sum + ("ids" in family ? family.ids!.length : "id" in family ? 1 : 0), 0);
   expect(count).toBe(21);
 });

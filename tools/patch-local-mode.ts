@@ -6,6 +6,7 @@ import { readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { shortcutBridge, shortcutBridgeOffset } from "./shortcut-bridge";
 import { localCloseBridge, localCloseBridgeOffset } from "./local-close-bridge";
+import { finalApp, stagedApp } from "./build-paths";
 
 type Patch = { readonly address: bigint; readonly original: Buffer; readonly replacement: Buffer };
 const onboarding = Buffer.from("f44fbea9fd7b01a9fd430091f40300aaf30308aadbf7fc9700010036000080d23125fd97081480b9886a68381f010071e8079f1a020000142800805268020039fd7b41a9f44fc2a8c0035fd6", "hex");
@@ -116,7 +117,8 @@ export const patchLocalMode = (source: Buffer): Buffer => {
 
 if (import.meta.main) {
   const file = Bun.argv[2];
-  const allowed = ["ArcMod", "ArcModValidation"].map((name) => join(import.meta.dir, `../build/${name}.app/Contents/MacOS/Arc`));
+  // ArcMod builds and their staging copies (tools/build-paths.ts), never another app.
+  const allowed = ["ArcMod", "ArcModValidation"].flatMap((name) => [finalApp(name), stagedApp(name)].map((app) => join(app, "Contents/MacOS/Arc")));
   if (!file || !allowed.some((path) => realpathSync(file) === join(path))) throw new Error("patch only an ArcMod build executable");
   writeFileSync(file, patchLocalMode(readFileSync(file)));
   console.log("local mode: onboarding disabled, local windows enabled; account state unchanged");
