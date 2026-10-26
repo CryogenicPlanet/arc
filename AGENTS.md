@@ -3,7 +3,7 @@
 ## Context
 
 - Read `README.md`, the status issue (https://github.com/CryogenicPlanet/arc/issues/1), `notes/runtime-status.md`,
-  and relevant sections of `notes/HANDOFF.md` before changing behavior. The status issue
+  and relevant sections of `notes/internals.md` before changing behavior. The status issue
   and runtime status take precedence over older survey notes.
 - Target Arc **1.168.0 (88413), arm64**. Keep changes in the native app layer.
   ArcMod runs on Arc's own engine by default; our engine is the `engine/`
@@ -18,7 +18,11 @@
   clear scope; keep one writer in the shared checkout.
 - Keep patches narrow and fingerprinted. Preserve native ownership, calling
   conventions, register state and valid state checks. Resolve local feature guards
-  at their call sites rather than changing global authentication getters.
+  at their call sites rather than changing global authentication getters, and never
+  create a fake account or token.
+- Don't defeat Apple's or The Browser Company's own enforcement: no working around
+  entitlement checks, no interposing libSystem path functions to relocate data, no
+  forging the sign-in flow.
 - Keep source changes and fixes in focused Git commits. Get a fresh review for
   meaningful native changes before committing.
 - For shared coordination, fetch `https://chirp.cryo.wtf/init` at session start and

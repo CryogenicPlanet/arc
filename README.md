@@ -251,6 +251,6 @@ LFS because Arc's auto-update replaces the installed copy. They skip when the fi
 - `engine/`: the [Arc Engine](https://github.com/CryogenicPlanet/arc-engine) submodule
 - `ghidra/`, `dump/`: Arc 1.168.0 decompile and symbol dumps (Git LFS); the analyzed Ghidra
   project stays local
-- `notes/`: findings and runtime evidence; start with [HANDOFF.md](notes/HANDOFF.md)
+- `notes/`: findings and runtime evidence; start with [internals.md](notes/internals.md)
 
 Coding agents working on this repo should read [AGENTS.md](AGENTS.md) first.
