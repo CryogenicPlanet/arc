@@ -8,6 +8,15 @@ changes are listed first. It is not a known-good shortcut baseline.
 
 ## Since 2026-10-13
 
+- **Little Arc alone when hidden** (Settings → ArcMod, off by default; 2026-11-20). With ArcMod
+  hidden (Cmd+H), a link or the global new-Little-Arc hotkey shows only Little Arc. Links arrive as
+  kAEGetURL in `OpenURLClient.OpenURLEventManager handleEvent:withReplyEvent:`, 15–25 ms after the
+  activation has already unhidden every window, so on `NSApplicationWillUnhideNotification` the main
+  windows go transparent for 0.15 s and are ordered out if a link arrives. The hotkey
+  (`RegisterEventHotKey` in ArcCore) arrives while still hidden; a Carbon `kEventHotKeyPressed`
+  handler orders them out first and passes the event on. Closing Little Arc brings them back and
+  hides ArcMod again; the Dock icon or moving the tab into a main window shows them. Checked on the
+  everyday ArcMod with `open -b` links (three runs) and the hotkey by hand.
 - `tools/import-arc-data.ts` copies a stock Arc profile's cookies, site storage,
   extensions, history and permissions into ArcMod (2026-10-22).
 - `bun tools/build-mod.ts --engine <ArcCore.framework>` builds ArcMod on another engine,

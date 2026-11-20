@@ -3,6 +3,7 @@
 // commands, adds the requested sidebar marker, badges the app icon and retains one Little Arc window.
 
 #import <AppKit/AppKit.h>
+#import <Carbon/Carbon.h>
 #import <CoreServices/CoreServices.h>
 #import <mach-o/dyld.h>
 #import <sys/xattr.h>
@@ -454,6 +455,167 @@ static void ArcModConsolidateLittleWindows(NSWindow *preferred) {
 			if (window.isVisible && [NSStringFromClass(window.class) isEqualToString:@"Arc.LittleBrowserWindow"]) count++;
 		ArcModLog(@"validation: %lu visible Little Arc window(s)", (unsigned long)count);
 	}
+}
+
+// Little Arc alone: a link opened while ArcMod is hidden (Cmd+H) shows only its Little Arc. macOS unhides every
+// window to show it, so the main windows are put aside first and come back, hidden again, once Little Arc closes,
+// or in front when ArcMod's Dock icon is clicked or Little Arc's tab moves into a main window.
+static NSString *const ArcModLittleArcAloneKey = @"ArcModLittleArcAlone"; // off by default: Arc's behavior
+static NSMutableArray<NSWindow *> *gStashedWindows;
+static NSHashTable<NSWindow *> *gVisibleAtHide; // while hidden every window reports isVisible == NO
+static CFAbsoluteTime gUnhiddenAt;
+// The activation that delivers a link unhides the app before the link itself arrives, so the main windows come back
+// transparent and stay that way for a moment: a link puts them aside, anything else (Cmd+Tab, Dock) shows them.
+static NSArray<NSWindow *> *gVeiledWindows;
+static const double ArcModVeilSeconds = 0.15; // links arrive 15–25 ms after the unhide
+
+static void ArcModUnveilMainWindows(void) {
+	for (NSWindow *window in gVeiledWindows) window.alphaValue = 1;
+	gVeiledWindows = nil;
+}
+
+static BOOL ArcModLittleArcAlone(void) {
+	return !ArcModAgentSession().length && [NSUserDefaults.standardUserDefaults boolForKey:ArcModLittleArcAloneKey];
+}
+
+static BOOL ArcModIsMainBrowserWindow(NSWindow *window) {
+	return [NSStringFromClass(window.class) isEqualToString:@"Arc.BrowserWindow"];
+}
+
+static BOOL ArcModIsLittleWindow(NSWindow *window) {
+	return [NSStringFromClass(window.class) isEqualToString:@"Arc.LittleBrowserWindow"];
+}
+
+static void ArcModStashMainWindows(void) {
+	if (!gStashedWindows) gStashedWindows = [NSMutableArray new];
+	for (NSWindow *window in NSApp.windows)
+		if (ArcModIsMainBrowserWindow(window) && (NSApp.isHidden ? [gVisibleAtHide containsObject:window] : window.isVisible)
+			&& ![gStashedWindows containsObject:window]) {
+			[gStashedWindows addObject:window];
+			[window orderOut:nil];
+		}
+	ArcModUnveilMainWindows(); // ordered out now, so they can be opaque again
+	if (gStashedWindows.count) ArcModLog(@"little arc alone: put %lu main window(s) aside", (unsigned long)gStashedWindows.count);
+}
+
+static void ArcModRestoreMainWindows(BOOL front) {
+	NSArray<NSWindow *> *windows = gStashedWindows;
+	gStashedWindows = nil;
+	if (!windows.count) return;
+	for (NSWindow *window in windows.reverseObjectEnumerator) {
+		if (front) [window orderFront:nil];
+		else [window orderBack:nil];
+	}
+	if (front) [windows.firstObject makeKeyAndOrderFront:nil];
+	ArcModLog(@"little arc alone: brought back %lu main window(s)", (unsigned long)windows.count);
+}
+
+// Arc takes links as kAEGetURL Apple Events in OpenURLClient's OpenURLEventManager.
+typedef void (*HandleURLEventIMP)(id, SEL, NSAppleEventDescriptor *, NSAppleEventDescriptor *);
+static HandleURLEventIMP gOriginalHandleURLEvent;
+static void ArcModHandleURLEvent(id self, SEL command, NSAppleEventDescriptor *event, NSAppleEventDescriptor *reply) {
+	// Hidden now, or unhidden a moment ago by the activation that delivers the link.
+	double since = CFAbsoluteTimeGetCurrent() - gUnhiddenAt;
+	BOOL hidden = NSApp.isHidden || since < 1.0;
+	if (hidden && ArcModLittleArcAlone() && [NSUserDefaults.standardUserDefaults boolForKey:@"openExternalLinksInLittleBrowserEnabled"]) {
+		if (!NSApp.isHidden) ArcModLog(@"little arc alone: link %.0f ms after unhide", since * 1000);
+		ArcModStashMainWindows();
+	}
+	gOriginalHandleURLEvent(self, command, event, reply);
+}
+
+// Arc's only global hotkey (new Little Arc, registered with RegisterEventHotKey in ArcCore) arrives while ArcMod is
+// still hidden, before Arc activates it. Put the main windows aside right there; Arc's own handler runs next.
+static OSStatus ArcModHotKeyPressed(__unused EventHandlerCallRef next, __unused EventRef event, __unused void *data) {
+	if (NSApp.isHidden && ArcModLittleArcAlone()) {
+		ArcModLog(@"little arc alone: global hotkey while hidden");
+		ArcModStashMainWindows();
+	}
+	return eventNotHandledErr;
+}
+
+typedef BOOL (*ReopenIMP)(id, SEL, NSApplication *, BOOL);
+static ReopenIMP gOriginalReopen;
+static BOOL ArcModShouldHandleReopen(id self, SEL command, NSApplication *app, BOOL visible) {
+	ArcModUnveilMainWindows();
+	if (gStashedWindows.count) {
+		ArcModRestoreMainWindows(YES);
+		visible = YES;
+	}
+	return gOriginalReopen(self, command, app, visible);
+}
+
+static void ArcModInstallLittleArcAlone(void) {
+	if (ArcModAgentSession().length) return;
+	Class delegate = [NSApp.delegate class];
+	Class urls = NSClassFromString(@"_TtC13OpenURLClient19OpenURLEventManager");
+	SEL handle = @selector(handleEvent:withReplyEvent:);
+	Method open = urls ? class_getInstanceMethod(urls, handle) : NULL;
+	Method reopen = delegate ? class_getInstanceMethod(delegate, @selector(applicationShouldHandleReopen:hasVisibleWindows:)) : NULL;
+	if (!open || !reopen) {
+		ArcModLog(@"little arc alone: missing %@", !open ? @"OpenURLEventManager handleEvent:withReplyEvent:" : @"reopen");
+		return;
+	}
+	gOriginalHandleURLEvent = (HandleURLEventIMP)method_getImplementation(open);
+	if (!class_addMethod(urls, handle, (IMP)ArcModHandleURLEvent, method_getTypeEncoding(open)))
+		method_setImplementation(open, (IMP)ArcModHandleURLEvent);
+	gOriginalReopen = (ReopenIMP)method_getImplementation(reopen);
+	if (!class_addMethod(delegate, @selector(applicationShouldHandleReopen:hasVisibleWindows:), (IMP)ArcModShouldHandleReopen, method_getTypeEncoding(reopen)))
+		method_setImplementation(reopen, (IMP)ArcModShouldHandleReopen);
+
+	EventTypeSpec hotKey = {kEventClassKeyboard, kEventHotKeyPressed};
+	OSStatus installed = InstallApplicationEventHandler(NewEventHandlerUPP(ArcModHotKeyPressed), 1, &hotKey, NULL, NULL);
+	if (installed != noErr) ArcModLog(@"little arc alone: hotkey handler not installed (%d)", (int)installed);
+
+	NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
+	[center addObserverForName:NSApplicationWillUnhideNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+		if (!ArcModLittleArcAlone() || ![NSUserDefaults.standardUserDefaults boolForKey:@"openExternalLinksInLittleBrowserEnabled"]) return;
+		NSMutableArray<NSWindow *> *veiled = [NSMutableArray new];
+		for (NSWindow *window in gVisibleAtHide) {
+			window.alphaValue = 0;
+			[veiled addObject:window];
+		}
+		gVeiledWindows = veiled;
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ArcModVeilSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			ArcModUnveilMainWindows();
+		});
+	}];
+	[center addObserverForName:NSApplicationDidUnhideNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+		gUnhiddenAt = CFAbsoluteTimeGetCurrent();
+		// Put aside while hidden (the hotkey): keep them out even if the unhide brought them back.
+		for (NSWindow *window in gStashedWindows) if (window.isVisible) [window orderOut:nil];
+	}];
+	// Hidden again with Little Arc open: the main windows hide with the app, ready for a normal unhide.
+	[center addObserverForName:NSApplicationWillHideNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
+		ArcModRestoreMainWindows(NO);
+		gVisibleAtHide = [NSHashTable weakObjectsHashTable];
+		for (NSWindow *window in NSApp.windows)
+			if (ArcModIsMainBrowserWindow(window) && window.isVisible) [gVisibleAtHide addObject:window];
+	}];
+	// A link that arrives after the unhide: Little Arc comes forward with the main windows still out.
+	[center addObserverForName:NSWindowDidBecomeKeyNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) {
+		NSWindow *window = note.object;
+		if (ArcModIsMainBrowserWindow(window) && gStashedWindows.count) ArcModRestoreMainWindows(NO); // e.g. "Open in…"
+	}];
+	[center addObserverForName:NSWindowWillCloseNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification *note) {
+		if (!ArcModIsLittleWindow(note.object) || !gStashedWindows.count) return;
+		// Moving the tab into a main window also closes Little Arc; let that window come forward first.
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			if (!gStashedWindows.count) return;
+			for (NSWindow *window in NSApp.windows)
+				if (window.isVisible && (ArcModIsLittleWindow(window) || ArcModIsMainBrowserWindow(window))) {
+					ArcModRestoreMainWindows(NO);
+					return;
+				}
+			// Back in place, invisible until the app is hidden, so they don't flash before it goes.
+			NSArray<NSWindow *> *windows = [gStashedWindows copy];
+			for (NSWindow *window in windows) window.alphaValue = 0;
+			ArcModRestoreMainWindows(NO);
+			[NSApp hide:nil];
+			for (NSWindow *window in windows) window.alphaValue = 1;
+		});
+	}];
+	ArcModLog(@"little arc alone: installed on %@", NSStringFromClass(delegate));
 }
 
 static void ArcModInstallMenu(void) {
@@ -923,6 +1085,8 @@ static NSView *ArcModBuildSettingsPane(void) {
 		ArcModSettingsGroup(@[
 			ArcModSettingsRow(@"One Little Arc", @"Links reuse the open Little Arc window. Off: Arc's behavior, a new Little Arc unless the link is for the same site. Turning it back on closes extra Little Arcs.",
 				ArcModSettingsSwitch(ArcModOneLittleArc(), @selector(setOneLittleArc:), !agent)),
+			ArcModSettingsRow(@"Little Arc alone when hidden", @"A link opened while ArcMod is hidden (⌘H) shows only Little Arc. Closing it hides ArcMod again; clicking ArcMod in the Dock brings the windows back.",
+				ArcModSettingsSwitch(ArcModLittleArcAlone(), @selector(setLittleArcAlone:), !agent)),
 		]),
 		ArcModSettingsLabel(@"Agents", 13, NSFontWeightSemibold, NSColor.labelColor),
 		ArcModSettingsGroup(@[
@@ -1024,6 +1188,10 @@ static void ArcModShowSettingsPaneIn(NSToolbar *toolbar) {
 - (void)setSidebarMarker:(NSSwitch *)sender { ArcModSetSidebarMarkerShown(sender.state == NSControlStateValueOn); }
 - (void)setIconBadge:(NSSwitch *)sender { ArcModSetIconBadgeShown(sender.state == NSControlStateValueOn); }
 - (void)setOneLittleArc:(NSSwitch *)sender { ArcModSetOneLittleArc(sender.state == NSControlStateValueOn); }
+- (void)setLittleArcAlone:(NSSwitch *)sender {
+	[NSUserDefaults.standardUserDefaults setBool:sender.state == NSControlStateValueOn forKey:ArcModLittleArcAloneKey];
+	if (sender.state != NSControlStateValueOn) ArcModRestoreMainWindows(NO);
+}
 - (void)setAgentTools:(NSSwitch *)sender { ArcModSetAgentToolsOn(sender.state == NSControlStateValueOn); }
 - (void)setAutomaticUpdates:(NSSwitch *)sender { ArcModSetAutomaticUpdateChecks(sender.state == NSControlStateValueOn); }
 - (void)rename:(id)sender { if (self.nameField) ArcModRename(self.nameField.stringValue); }
@@ -1324,6 +1492,7 @@ __attribute__((constructor)) static void ArcModInit(void) {
 	[[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidFinishLaunchingNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
 		ArcModLog(@"didFinishLaunching, NSApp class = %@", NSStringFromClass([NSApp class]));
 		ArcModInstallHooks();
+		ArcModInstallLittleArcAlone();
 		ArcModRefreshAppIcon(NO);
 		ArcModApplyAppName();
 		// At most one release check a day: 15 s after launch, then whenever the hourly timer finds the last one stale.
