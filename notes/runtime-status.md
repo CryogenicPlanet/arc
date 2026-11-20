@@ -8,6 +8,11 @@ changes are listed first. It is not a known-good shortcut baseline.
 
 ## Since 2026-10-13
 
+- Little Arc can be dragged by its top bar (2026-11-20). The address field and profile chip take
+  the mouse, so the window used to move only from the few empty pixels around them. A press in
+  the top 48 pt that turns into a drag of 3 pt or more now calls `performWindowDragWithEvent:`;
+  a plain click still reaches Arc. Built and loaded on the everyday ArcMod; not yet
+  checked by hand.
 - `tools/import-arc-data.ts` copies a stock Arc profile's cookies, site storage,
   extensions, history and permissions into ArcMod (2026-10-22).
 - `bun tools/build-mod.ts --engine <ArcCore.framework>` builds ArcMod on another engine,
