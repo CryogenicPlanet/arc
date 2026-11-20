@@ -8,6 +8,12 @@ changes are listed first. It is not a known-good shortcut baseline.
 
 ## Since 2026-10-13
 
+- Sidebar tab icons survive a restart (2026-11-20). Arc 1.168 shows an unloaded tab's icon only
+  from its `savedFaviconPNGData`, which it never writes back to `StorableSidebar.json`; fetched
+  icons go to `SidebarItemsFaviconCache/<md5 of the item ID>`, and offline LaunchDarkly also turns
+  `sidebar-sync-favicons-enabled` off, which stops those writes. The dylib turns the flag on and,
+  before Arc reads the sidebar, puts each cached icon back into its tab. Checked on the everyday
+  ArcMod: 165 pinned tabs and favorites kept their icons across several restarts.
 - `tools/import-arc-data.ts` copies a stock Arc profile's cookies, site storage,
   extensions, history and permissions into ArcMod (2026-10-22).
 - `bun tools/build-mod.ts --engine <ArcCore.framework>` builds ArcMod on another engine,

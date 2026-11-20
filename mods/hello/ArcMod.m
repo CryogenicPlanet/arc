@@ -3,6 +3,7 @@
 // commands, adds the requested sidebar marker, badges the app icon and retains one Little Arc window.
 
 #import <AppKit/AppKit.h>
+#import <CommonCrypto/CommonDigest.h>
 #import <CoreServices/CoreServices.h>
 #import <mach-o/dyld.h>
 #import <sys/xattr.h>
@@ -494,7 +495,7 @@ static void ArcModInstallMenu(void) {
 }
 
 static void ArcModApplyPerformanceDefaults(NSUserDefaults *defaults) {
-	// These six keys have registered, typed getters in this Arc build. Preserve
+	// These keys have registered, typed getters in this Arc build. Preserve
 	// unrelated development overrides, then apply the local performance policy.
 	NSMutableDictionary<NSString *, NSString *> *overrides = [NSMutableDictionary new];
 	NSString *existing = [defaults stringForKey:@"transientFeatureFlagOverrides"];
@@ -509,6 +510,8 @@ static void ArcModApplyPerformanceDefaults(NSUserDefaults *defaults) {
 		@"analytics-interaction-instrumentation-client-enabled": @"false",
 		@"windows-layout-cycle-tracing-enabled": @"false",
 		@"sidebar-snapshot-analytics-enabled": @"false",
+		// Offline LaunchDarkly leaves this off, so Arc stops writing SidebarItemsFaviconCache.
+		@"sidebar-sync-favicons-enabled": @"true",
 	}];
 	NSMutableArray<NSString *> *pairs = [NSMutableArray new];
 	for (NSString *key in [[overrides allKeys] sortedArrayUsingSelector:@selector(compare:)])
@@ -1290,9 +1293,57 @@ static void ArcModEnsureKeychainProfile(void) {
 	exit(0);
 }
 
+// Arc 1.168 shows an unloaded sidebar tab's icon only from the tab's savedFaviconPNGData, which it doesn't write
+// back to StorableSidebar.json; the icons it fetches go to SidebarItemsFaviconCache/<md5 of the item ID> instead.
+// So after a restart pinned tabs and favorites lose their icons. Before Arc reads the sidebar, put each cached
+// icon back into its tab. Runs before NSApplication exists, so it only touches files.
+static NSString *ArcModMD5(NSString *text) {
+	NSData *data = [text dataUsingEncoding:NSUTF8StringEncoding];
+	unsigned char digest[CC_MD5_DIGEST_LENGTH];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+	CC_MD5(data.bytes, (CC_LONG)data.length, digest);
+#pragma clang diagnostic pop
+	NSMutableString *hex = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+	for (int i = 0; i < CC_MD5_DIGEST_LENGTH; i++) [hex appendFormat:@"%02x", digest[i]];
+	return hex;
+}
+
+static void ArcModRestoreSidebarFavicons(void) {
+	NSString *support = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES).firstObject;
+	NSString *folder = [support stringByAppendingPathComponent:NSBundle.mainBundle.infoDictionary[@"CFBundleName"]];
+	NSString *path = [folder stringByAppendingPathComponent:@"StorableSidebar.json"];
+	NSString *cache = [folder stringByAppendingPathComponent:@"SidebarItemsFaviconCache"];
+	NSData *raw = [NSData dataWithContentsOfFile:path];
+	if (!raw) return;
+	NSMutableDictionary *root = [NSJSONSerialization JSONObjectWithData:raw options:NSJSONReadingMutableContainers error:nil];
+	if (![root isKindOfClass:NSDictionary.class]) return;
+	NSArray *containers = [root[@"sidebar"] isKindOfClass:NSDictionary.class] ? root[@"sidebar"][@"containers"] : nil;
+	if (![containers isKindOfClass:NSArray.class]) return;
+	NSUInteger restored = 0;
+	for (id container in containers) {
+		if (![container isKindOfClass:NSDictionary.class] || ![container[@"items"] isKindOfClass:NSArray.class]) continue;
+		for (id item in container[@"items"]) {
+			if (![item isKindOfClass:NSDictionary.class] || ![item[@"id"] isKindOfClass:NSString.class]) continue;
+			NSMutableDictionary *tab = [item[@"data"] isKindOfClass:NSDictionary.class] ? item[@"data"][@"tab"] : nil;
+			if (![tab isKindOfClass:NSMutableDictionary.class] || tab[@"savedFaviconPNGData"]) continue;
+			NSData *png = [NSData dataWithContentsOfFile:[cache stringByAppendingPathComponent:ArcModMD5(item[@"id"])]];
+			if (png.length < 8 || memcmp(png.bytes, "\x89PNG", 4) != 0) continue;
+			tab[@"savedFaviconPNGData"] = [png base64EncodedStringWithOptions:0];
+			restored++;
+		}
+	}
+	if (!restored) return;
+	NSData *out = [NSJSONSerialization dataWithJSONObject:root options:0 error:nil];
+	if (!out || ![out writeToFile:path options:NSDataWritingAtomic error:nil]) return;
+	[NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:path error:nil];
+	ArcModLog(@"favicons: restored %lu sidebar tab icons from the cache", (unsigned long)restored);
+}
+
 __attribute__((constructor)) static void ArcModInit(void) {
 	ArcModEnsureSingleInstance();
 	ArcModEnsureKeychainProfile();
+	ArcModRestoreSidebarFavicons();
 	ArcModApplyLittleArcSetting();
 	ArcModAddLaunchSwitches();
 	ArcModInstallSettingsPane();
