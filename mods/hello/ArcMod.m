@@ -456,6 +456,40 @@ static void ArcModConsolidateLittleWindows(NSWindow *preferred) {
 	}
 }
 
+// Little Arc's top bar (address, profile chip) takes the mouse itself, so the window moves only from the few empty
+// pixels around it. A press there that turns into a drag moves the window instead; a plain click is left alone.
+static const CGFloat ArcModLittleBarHeight = 48;
+static const CGFloat ArcModDragThreshold = 3;
+
+static void ArcModInstallLittleArcDrag(void) {
+	if (ArcModAgentSession().length) return;
+	__block NSEvent *pressed;
+	[NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskLeftMouseDown | NSEventMaskLeftMouseDragged | NSEventMaskLeftMouseUp
+		handler:^NSEvent *(NSEvent *event) {
+		NSWindow *window = event.window;
+		if (event.type == NSEventTypeLeftMouseDown) {
+			pressed = nil;
+			if (![NSStringFromClass(window.class) isEqualToString:@"Arc.LittleBrowserWindow"] || event.clickCount != 1) return event;
+			if (event.locationInWindow.y < NSHeight(window.contentView.bounds) - ArcModLittleBarHeight) return event;
+			NSView *hit = [window.contentView hitTest:[window.contentView convertPoint:event.locationInWindow fromView:nil]];
+			if ([hit isKindOfClass:NSTextView.class] && window.firstResponder == hit) return event; // editing text: keep selection
+			pressed = event;
+			return event;
+		}
+		if (event.type == NSEventTypeLeftMouseUp || !pressed || event.window != pressed.window) {
+			pressed = nil;
+			return event;
+		}
+		if (hypot(event.locationInWindow.x - pressed.locationInWindow.x, event.locationInWindow.y - pressed.locationInWindow.y) < ArcModDragThreshold)
+			return event;
+		NSEvent *down = pressed;
+		pressed = nil;
+		[down.window performWindowDragWithEvent:down];
+		return nil;
+	}];
+	ArcModLog(@"little arc: top bar drags the window");
+}
+
 static void ArcModInstallMenu(void) {
 	NSMenu *main = NSApp.mainMenu;
 	if (!main || [main itemWithTitle:@"ArcMod"]) return;
@@ -1324,6 +1358,7 @@ __attribute__((constructor)) static void ArcModInit(void) {
 	[[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidFinishLaunchingNotification object:nil queue:NSOperationQueue.mainQueue usingBlock:^(__unused NSNotification *note) {
 		ArcModLog(@"didFinishLaunching, NSApp class = %@", NSStringFromClass([NSApp class]));
 		ArcModInstallHooks();
+		ArcModInstallLittleArcDrag();
 		ArcModRefreshAppIcon(NO);
 		ArcModApplyAppName();
 		// At most one release check a day: 15 s after launch, then whenever the hourly timer finds the last one stale.
