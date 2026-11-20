@@ -104,6 +104,8 @@ menu bar):
   takes effect the next time ArcMod starts, and rebuilds keep it. ArcMod's data stays in
   `~/Library/Application Support/ArcMod` whatever you call it.
 - **One Little Arc** makes every link reuse the open Little Arc. Turn it off for Arc's behavior.
+- **Little Arc alone when hidden** shows only Little Arc when a link or the Little Arc hotkey
+  arrives while ArcMod is hidden (Cmd+H); closing it hides ArcMod again. Off by default.
 - **Agent browser tools** lets coding agents open their own background browsers.
 - **Import from Arc** and **Updates** are there too.
 

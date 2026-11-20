@@ -89,7 +89,7 @@ const dylib = join(root, "build/ArcMod.dylib");
 step("compile mods/hello/ArcMod.m → build/ArcMod.dylib");
 sh([
   "clang", "-dynamiclib", "-arch", "arm64", "-fobjc-arc", "-Wall", "-Wextra", "-Werror", "-mmacosx-version-min=13.0",
-  "-framework", "AppKit", "-framework", "CoreServices", "-I", join(root, "build"), "-install_name", DYLIB_INSTALL, "-o", dylib,
+  "-framework", "AppKit", "-framework", "Carbon", "-framework", "CoreServices", "-I", join(root, "build"), "-install_name", DYLIB_INSTALL, "-o", dylib,
   join(root, "mods/hello/ArcMod.m"), join(root, "mods/local/ServicePolicy.m"),
   join(root, "mods/local/ShortcutPolicy.m"),
 ]);
